@@ -1,0 +1,26 @@
+#!/usr/bin/php -q
+<?php
+
+include('/var/lib/asterisk/agi-bin/phpagi/phpagi.php');
+$conf_pin=$argv[1];
+$agi = new AGI ();
+$db = mysqli_connect("127.0.0.1", "root", "GFDUedThsS", "bigdialer");
+
+if (!$db) {
+ $agi->verbose("Error trying to connect to MYSQL". mysqli_connect_error ());
+ exit (0);
+}
+
+$res=$db->query("SELECT * FROM cc_conf WHERE conf_pin='$conf_pin';");
+if($res->num_rows==0) {
+  $agi->set_variable("PINSTATUS",0);
+  $agi->set_variable("MESSAGE", "Found invalid conference pin number");
+}else{
+  $row = $res->fetch_object();
+  $agi->set_variable("PINSTATUS",1);
+  $agi->set_variable("MESSAGE",$row->msg);
+}
+$res->close();
+$db->close ();
+exit(0);
+?>

@@ -1,0 +1,35 @@
+Name/username             Host                                    Dyn Forcerport Comedia    ACL Port     Status      Description                      
+1234/1234                 (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+134446/134446             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+146564/146564             45.118.158.98                            D  Yes        Yes            5919     UNREACHABLE                                  
+208227/208227             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+261343/261343             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+306159/306159             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+325180/325180             45.118.158.98                            D  Yes        Yes            5883     UNREACHABLE                                  
+352866/352866             45.118.158.98                            D  Yes        Yes            5619     UNREACHABLE                                  
+442341/442341             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+474310/474310             125.63.88.114                            D  Yes        Yes            62667    OK (284 ms)                                  
+563353/563353             45.118.158.98                            D  Yes        Yes            5822     UNREACHABLE                                  
+622494/622494             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+681042/681042             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+728267/728267             45.118.158.98                            D  Yes        Yes            6238     UNREACHABLE                                  
+759938/759938             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+800134/800134             45.118.158.98                            D  Yes        Yes            6135     UNREACHABLE                                  
+845997/845997             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+940606/940606             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+Air-Tell-PRI/68296        (Unspecified)                               Yes        Yes            0        UNKNOWN                                      
+Alcaz                     162.212.218.21                              Yes        Yes            5060     OK (82 ms)                                   
+Alcaz1                    162.212.218.50                              Yes        Yes            5060     OK (90 ms)                                   
+Alcaz2                    162.212.218.52                              Yes        Yes            5060     OK (96 ms)                                   
+IDT-TRUNK                 213.166.103.1                               Yes        Yes            5060     OK (91 ms)                                   
+OUTBOND                   54.172.60.1                                 Yes        Yes            5060     OK (95 ms)                                   
+Twilio-TRUNK              54.172.60.1                                 Yes        Yes            5060     OK (95 ms)                                   
+Voxbeam                   108.59.2.133                                Yes        Yes            5060     OK (91 ms)                                   
+ast/ast                   85.195.76.161                            D  Yes        Yes            50070    UNREACHABLE                                  
+idt-inbound               206.20.196.38                               Yes        Yes            5060     OK (90 ms)                                   
+idt-inbound1              169.132.196.47                              Yes        Yes            5060     OK (93 ms)                                   
+idt-inbound2              111.235.152.142                             Yes        Yes            5060     OK (91 ms)                                   
+idt-inbound3              213.166.103.22                              Yes        Yes            5060     OK (91 ms)                                   
+idt-inbound4              169.132.196.47                              Yes        Yes            5060     OK (94 ms)                                   
+32 sip peers [Monitored: 13 online, 19 offline Unmonitored: 0 online, 0 offline]
+Asterisk ending (0).

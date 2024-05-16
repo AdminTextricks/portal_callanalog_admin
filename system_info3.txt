@@ -1,0 +1,22 @@
+Disk Space:
+/dev/md2        1.8T   16G  1.7T   1% /
+
+Memory Usage:
+              total        used        free      shared  buff/cache   available
+Mem:            31G        959M         29G        868M        1.1G         29G
+Swap:          7.9G          0B        7.9G
+
+Timezone:
+       Time zone: America/New_York (EDT, -0400)
+
+Uptime:
+ 07:28:34 up 41 days,  5:25,  2 users,  load average: 0.04, 0.06, 0.05
+
+CPU Usage:
+%Cpu(s):  0.3 us,  0.6 sy,  0.0 ni, 99.1 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+
+Bandwidth:
+Average:     enp2s0f0      2.00      0.00      0.12      0.00      0.00      0.00      0.00
+
+Total Bandwidth:
+    enp2s0f0 (100 Mbit) enp2s0f1 lo 

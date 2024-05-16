@@ -1,0 +1,23 @@
+#!/usr/bin/php -q
+<?php
+require_once "phpagi/phpagi.php";
+            $ini_array = parse_ini_file("/etc/iglobal.conf");
+            $connA = mysql_connect($ini_array["hostname"], $ini_array["user"], $ini_array["password"]);
+            mysql_select_db($ini_array["dbname"], $connA);
+
+pcntl_signal(SIGHUP, SIG_IGN);
+set_time_limit(30);
+  error_reporting(E_ALL);
+$AGI = new AGI();
+
+
+$did=$AGI->request['agi_extension'];
+$q1="select username from cc_card where id in(select iduser from cc_did where did='$did')";
+$AGI->verbose("Query: $q1)");
+$res1=mysql_query($q1);
+$d1=mysql_fetch_assoc($res1);
+$account=$d1['username'];
+$AGI->verbose("Accountcode $account)");
+$AGI->set_variable('CDR(accountcode)', $account);
+?>
+

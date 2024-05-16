@@ -1,0 +1,19 @@
+Name/username             Host                                    Dyn Forcerport Comedia    ACL Port     Status      Description                      Realtime
+1234/1234                 (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+749410/749410             125.63.88.114                            D  Yes        Yes         A  56005    Unmonitored                                  Cached RT
+146032/146032             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+195544/195544             (Unspecified)                            D  Yes        Yes            0        UNKNOWN                                      
+858149/858149             125.63.88.114                            D  Yes        Yes         A  18116    Unmonitored                                  Cached RT
+Air-Tell-PRI/68296        (Unspecified)                               Yes        Yes            0        UNKNOWN                                      
+IDT-TRUNK                 213.166.103.1                               Yes        Yes            5060     OK (16 ms)                                   
+OUTBOND                   54.172.60.0                                 Yes        Yes            5060     OK (96 ms)                                   
+Twilio-TRUNK              54.172.60.1                                 Yes        Yes            5060     OK (95 ms)                                   
+Voxbeam                   108.59.2.133                                Yes        Yes            5060     OK (91 ms)                                   
+ast/ast                   85.195.76.161                            D  Yes        Yes            50070    OK (1 ms)                                    
+idt-inbound               206.20.196.38                               Yes        Yes            5060     OK (92 ms)                                   
+idt-inbound1              169.132.196.47                              Yes        Yes            5060     OK (90 ms)                                   
+idt-inbound2              111.235.152.142                             Yes        Yes            5060     OK (194 ms)                                  
+idt-inbound3              213.166.103.22                              Yes        Yes            5060     OK (15 ms)                                   
+idt-inbound4              169.132.196.47                              Yes        Yes            5060     OK (93 ms)                                   
+16 sip peers [Monitored: 10 online, 4 offline Unmonitored: 2 online, 0 offline]
+Asterisk ending (0).

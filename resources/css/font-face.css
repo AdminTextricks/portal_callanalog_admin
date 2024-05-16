@@ -1,0 +1,28 @@
+@font-face{
+    font-family:Spezia;font-style:normal;font-weight:600;
+    src:url(../fonts/spezia/Spezia-SemiBold.f70cbb6cb02581827bde.eot?#iefix) format("embedded-opentype"),
+    url(../fonts/spezia/Spezia-SemiBold.bda9b0e2f93ab035b549.woff2) format("woff2"),
+    url(../fonts/spezia/Spezia-SemiBold.95268b199c1d669c6aa4.woff) format("woff"),
+    url(../fonts/spezia/Spezia-SemiBold.2baad1633bf4478d540b.ttf) format("truetype")
+  }
+  @font-face{
+    font-family:Spezia;font-style:normal;font-weight:800;
+    src:url(../fonts/spezia/Spezia-WideMedium.358bb99950de6ab2a424.eot?#iefix) format("embedded-opentype"),
+    url(../fonts/spezia/Spezia-WideMedium.07c7b07dd33bd1fc164d.woff2) format("woff2"),
+    url(../fonts/spezia/Spezia-WideMedium.69321d62bd7f0c36120d.woff) format("woff"),
+    url(../fonts/spezia/Spezia-WideMedium.7be11cc1fdd50b1bb7ee.ttf) format("truetype")
+  }
+  @font-face{
+    font-family:Spezia;font-style:normal;font-weight:900;
+    src:url(../fonts/spezia/Spezia-WideMedium.358bb99950de6ab2a424.eot?#iefix) format("embedded-opentype"),
+    url(../fonts/spezia/Spezia-WideMedium.07c7b07dd33bd1fc164d.woff2) format("woff2"),
+    url(../fonts/spezia/Spezia-WideMedium.69321d62bd7f0c36120d.woff) format("woff"),
+    url(../fonts/spezia/Spezia-WideMedium.7be11cc1fdd50b1bb7ee.ttf) format("truetype")
+  }
+  @font-face{
+    font-family:Spezia;font-style:normal;font-weight:400;
+    src:url(../fonts/spezia/Spezia-Regular.6e003e4d0e95fc1ba928.eot?#iefix) format("embedded-opentype"),
+    url(../fonts/spezia/Spezia-Regular.b2cdf0348d23f9296494.woff2) format("woff2"),
+    url(../fonts/spezia/Spezia-Regular.5ce2654f9e3fe99a8571.woff) format("woff"),
+    url(../fonts/spezia/Spezia-Regular.bcd17a3586af5a8cb2d3.ttf) format("truetype")
+  }

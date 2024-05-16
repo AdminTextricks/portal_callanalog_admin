@@ -1,0 +1,56 @@
+#!/usr/bin/php -q
+
+<?php
+
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+declare(ticks = 1);
+if (function_exists('pcntl_signal')) {
+    pcntl_signal(SIGHUP, SIG_IGN);
+}
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+require ('/var/www/html/iglobal/AGI/lib/phpagi/phpagi.php'); // I do not know if it's really necessary, as I said at the beginning, I know very little about PHP and AGI
+
+
+        $agi=new AGI();
+        $did=$_SERVER['argv'][1];
+        $mydid=$_SERVER['argv'][2];
+        $permission=$_SERVER['argv'][3];
+
+
+        $connection = mysql_connect("localhost","root","tumko34h1se");
+        mysql_select_db("iglobal",$connection);
+
+        $Query = "select id,did,activated,".$permission." from cc_did where did='".$mydid."'";
+        $rsQuery = mysql_query($Query);
+        $result = mysql_fetch_array($rsQuery);
+
+                $agi -> Noop($Query);
+
+                if ($result['did']!="") {
+                if ($result['activated']=="1" and $result[$permission]=="1") {
+                 //RingGroup
+                $agi -> set_variable("continue","1");
+        }
+                elseif ($result['activated']==="0" and $result[$permission]=="1") {
+                        //RingGroup
+                        $agi -> set_variable("continue","1");
+                }
+                elseif ($result['did']!=$mydid and $result['activated']=="1") {
+                        //Calling card
+                        $agi -> set_variable("continue","2");
+                }
+
+                elseif ($result[$permission]=="0") {
+                                //Pinbase agi3
+
+                                $agi -> set_variable("continue","2");
+                }
+        }
+
+                else{
+                //pin incorrect
+
+                $agi -> set_variable("continue","3");
+        }
+

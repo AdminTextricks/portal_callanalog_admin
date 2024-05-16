@@ -1,0 +1,530 @@
+  <?php require_once('connection.php'); 
+
+  //echo '<pre>';print_r($_SESSION);exit;
+  if(!isset($_SESSION['login_user']))
+  {
+    header('location: index.php');
+  }
+  $select_clientinfo = "select name,clientId,role,id from users_login where email='".$_SESSION['login_user']."'";
+  $result_clientinfo = mysqli_query($con,$select_clientinfo);
+  while($rowclientinfo = mysqli_fetch_array($result_clientinfo))
+  {
+    $currentlogin_user = $rowclientinfo['name'];
+    $currentlogin_useridss = $rowclientinfo['clientId'];
+    $currentlogin_userrole = $rowclientinfo['role'];
+    $currentlogin_userorgid = $rowclientinfo['id'];
+  }
+
+  $_SESSION['userroleforpage'] = $currentlogin_userrole;
+  $_SESSION['userroleforclientid'] = $currentlogin_useridss;
+
+  $select_barge = "select name from cc_sip_buddies where sip_type='Yes'";
+  $result_barge = mysqli_query($con,$select_barge); 
+  // if($currentlogin_userrole == 1 and $currentlogin_useridss=1){
+  // $select_menurs = "select menu_id from user_menu_list where user_id='".$currentlogin_userorgid."'";
+  // $result_menurs = mysqli_query($con,$select_menurs);
+  // }elseif($currentlogin_userrole == 2 ){
+  // $select_menurs = "select menu_id from user_menu_list where user_id='".$currentlogin_userorgid."'";
+  // $result_menurs = mysqli_query($con,$select_menurs);
+  // }else{
+    // $select_menurs = "select menuId from client_menus where clientId='".$currentlogin_useridss."'";
+  // $result_menurs = mysqli_query($con,$select_menurs);
+  // }
+
+  $select_menurs = "select menu_id from user_menu_list where user_id='".$currentlogin_userorgid."'";
+  $result_menurs = mysqli_query($con,$select_menurs);
+  
+  $stack_menus = array();
+  while($rowmenusrs = mysqli_fetch_array($result_menurs)){ 
+
+  array_push($stack_menus,$rowmenusrs);
+  }
+  $theArraymenuss = json_encode( $stack_menus );
+  $theArray1menus = json_decode($theArraymenuss, true);
+  ?>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="au theme template">
+  <meta name="author" content="Hau Nguyen">
+  <meta name="keywords" content="au theme template">
+
+  <title>My Phone Systems</title>
+
+  <link href="resources/css/font-face.css" rel="stylesheet" media="all"> 
+  <link href="resources/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all"> 
+
+  <link href="resources/vendor/font-awesome-5/css/fontawesome-all.min.css" rel="stylesheet" media="all"> 
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <link href="resources/vendor/animsition/animsition.min.css" rel="stylesheet" media="all">
+
+  <link href="resources/vendor/select2/select2.min.css" rel="stylesheet" media="all">
+  <link href="resources/vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
+  <link href="resources/css/theme.css" rel="stylesheet" media="all">
+  <link href="resources/css/custom_style.css" rel="stylesheet" media="all">
+  <link rel="icon" href="resources/images/favicon.png" sizes="32x32"/>
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+  <!-- Date pickers start -->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <!-- Date pickers end -->
+
+  <!-- <script src="resources/js/datatables.min.js"></script>
+  <link href='resources/css/datatables.min.css' rel='stylesheet' type='text/css'>
+
+
+  <script src="jquery-3.3.1.min_test.js"></script> -->
+  <script src="DataTables/datatables.min.js"></script>
+  <link href="DataTables/datatables.min.css" rel='stylesheet' type='text/css'>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>  
+  <link href="resources/css/bootstrap.min.css" rel="stylesheet" media="all">
+            <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  -->
+            <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>  
+            <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>            
+            
+  <script>
+  
+
+  </script>
+
+  <script language="javascript" type="text/javascript">
+    var autoLoad = setInterval(
+    function ()
+    {
+        $('#sample').load('biglives_content.php');
+    }, 1000); // refresh page every 10 seconds
+    
+    var autoLoad = setInterval(
+    function ()
+    {
+        $('#sample_barge').load('barge_content.php');
+    }, 5000); // refresh page every 10 seconds
+  </script>
+
+  </head>
+  <body class="animsition">
+
+        
+<div class="page-wrapper">
+
+  <header class="header-mobile d-block d-lg-none">
+  <div class="header-mobile__bar">
+  <div class="container-fluid">
+  <div class="header-mobile-inner">
+  <a class="logo" href="/">
+  <img src="resources/images/icon/logo.png" alt="CoolAdmin" />
+  </a>
+  <button class="hamburger hamburger--slider" type="button">
+  <span class="hamburger-box">
+  <span class="hamburger-inner"></span>
+  </span>
+  </button>
+  </div>
+  </div>
+  </div>
+  <nav class="navbar-mobile">
+
+  <div class="container-fluid">
+  <ul class="navbar-mobile__list list-unstyled">
+  <?php if($theArray1menus[0][0] == 1 OR $theArray1menus[1][0] == 1 OR $theArray1menus[2][0] == 1 OR $theArray1menus[3][0] == 1 OR $theArray1menus[4][0] == 1 OR $theArray1menus[5][0] == 1 OR $theArray1menus[6][0] ==1  OR $theArray1menus[7][0] == 1 OR $theArray1menus[8][0] == 1 OR $theArray1menus[9][0] == 1 OR $theArray1menus[10][0] == 1 OR $theArray1menus[11][0] == 1 OR $theArray1menus[12][0] == 1 OR $theArray1menus[13][0] == 1 ) { ?>
+  <li class="has-sub">
+  <a class="js-arrow" href="dashboard.php">
+  <i class="fa fa-tachometer"></i>Dashboard</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 2 OR $theArray1menus[1][0] == 2 OR $theArray1menus[2][0] == 2 OR $theArray1menus[3][0] == 2 OR $theArray1menus[4][0] == 2 OR $theArray1menus[5][0] == 2 OR $theArray1menus[6][0] ==2  OR $theArray1menus[7][0] == 2 OR $theArray1menus[8][0] == 2 OR $theArray1menus[9][0] == 2 OR $theArray1menus[10][0] == 2 OR $theArray1menus[11][0] == 2 OR $theArray1menus[12][0] == 2 OR $theArray1menus[13][0] == 2 OR $theArray1menus[14][0] == 2) { ?>
+  <li>
+  <a href="lives.php">
+  <i class="fa fa-podcast" aria-hidden="true"></i>TextRicks Live</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li>
+  <a href="queue.php">
+  <i class="fa fa-quora" aria-hidden="true"></i>Manage Queue</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li>
+  <a href="ring.php">
+  <i class="fa fa-tty" aria-hidden="true"></i>Manage Ring</a>
+  </li>
+  <?php } ?>
+
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li>
+  <a href="conference.php">
+  <i class="fa fa-users" aria-hidden="true"></i>Manage Conference</a>
+  </li>
+  <?php } ?>
+
+  <?php /*if($theArray1menus[0][0] == 15 OR $theArray1menus[1][0] == 15 OR $theArray1menus[2][0] == 15 OR $theArray1menus[3][0] == 15 OR $theArray1menus[4][0] == 15 OR $theArray1menus[5][0] == 15 OR $theArray1menus[6][0] ==15  OR $theArray1menus[7][0] == 15 OR $theArray1menus[8][0] == 15 OR $theArray1menus[9][0] == 15 OR $theArray1menus[10][0] == 15 OR $theArray1menus[11][0] == 15 OR $theArray1menus[12][0] == 15 OR $theArray1menus[13][0] == 15 OR $theArray1menus[14][0] == 15 ) { ?>
+  <li>
+  <a href="campaign.php">
+  <i class="fa fa-quora" aria-hidden="true"></i>Manage Campaign</a>
+  </li>
+  <?php } */?>
+
+
+  <?php if($theArray1menus[0][0] == 4 OR $theArray1menus[1][0] == 4 OR $theArray1menus[2][0] == 4 OR $theArray1menus[3][0] == 4 OR $theArray1menus[4][0] == 4 OR $theArray1menus[5][0] == 4 OR $theArray1menus[6][0] ==4  OR $theArray1menus[7][0] == 4 OR $theArray1menus[8][0] == 4 OR $theArray1menus[9][0] == 4 OR $theArray1menus[10][0] == 4 OR $theArray1menus[11][0] == 4 OR $theArray1menus[12][0] == 4 OR $theArray1menus[13][0] == 4 OR $theArray1menus[14][0] == 4 ) { ?>
+  <li>
+  <a href="extension.php">
+  <i class="fa fa-etsy" aria-hidden="true"></i>Manage Extension</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 5 OR $theArray1menus[1][0] == 5 OR $theArray1menus[2][0] == 5 OR $theArray1menus[3][0] == 5 OR $theArray1menus[4][0] == 5 OR $theArray1menus[5][0] == 5 OR $theArray1menus[6][0] ==5  OR $theArray1menus[7][0] == 5 OR $theArray1menus[8][0] == 5 OR $theArray1menus[9][0] == 5 OR $theArray1menus[10][0] == 5 OR $theArray1menus[11][0] == 5 OR $theArray1menus[12][0] == 5 OR $theArray1menus[13][0] == 5 OR $theArray1menus[14][0] == 5 ) { ?>
+  <li>
+  <a href="inbound.php">
+  <i class="fa fa-quora"></i>Inbound Destination</a>
+  </li>
+  <?php } ?>
+
+  <?php /*if($theArray1menus[0][0] == 6 OR $theArray1menus[1][0] == 6 OR $theArray1menus[2][0] == 6 OR $theArray1menus[3][0] == 6 OR $theArray1menus[4][0] == 6 OR $theArray1menus[5][0] == 6 OR $theArray1menus[6][0] ==6  OR $theArray1menus[7][0] == 6 OR $theArray1menus[8][0] == 6 OR $theArray1menus[9][0] == 6 OR $theArray1menus[10][0] == 6 OR $theArray1menus[11][0] == 6 OR $theArray1menus[12][0] == 6 OR $theArray1menus[13][0] == 6 OR $theArray1menus[14][0] == 6 ) { ?>
+  <li>
+  <a href="outboundroute.php">
+  <i class="fa fa-opera" aria-hidden="true"></i>Outbound Route</a>
+  </li>
+  <?php } */?>
+
+  <?php /*if($theArray1menus[0][0] == 7 OR $theArray1menus[1][0] == 7 OR $theArray1menus[2][0] == 7 OR $theArray1menus[3][0] == 7 OR $theArray1menus[4][0] == 7 OR $theArray1menus[5][0] == 7 OR $theArray1menus[6][0] ==7  OR $theArray1menus[7][0] == 7 OR $theArray1menus[8][0] == 7 OR $theArray1menus[9][0] == 7 OR $theArray1menus[10][0] == 7 OR $theArray1menus[11][0] == 7 OR $theArray1menus[12][0] == 7 OR $theArray1menus[13][0] == 7 OR $theArray1menus[14][0] == 7 ) { ?>
+  <li>
+  <a href="outboundroute.php">
+  <i class="fa fa-map-marker"></i>Trunk</a>
+  </li>
+  <?php } */?>
+
+  <?php if($theArray1menus[0][0] == 8 OR $theArray1menus[1][0] == 8 OR $theArray1menus[2][0] == 8 OR $theArray1menus[3][0] == 8 OR $theArray1menus[4][0] == 8 OR $theArray1menus[5][0] == 8 OR $theArray1menus[6][0] ==8  OR $theArray1menus[7][0] == 8 OR $theArray1menus[8][0] == 8 OR $theArray1menus[9][0] == 8 OR $theArray1menus[10][0] == 8 OR $theArray1menus[11][0] == 8 OR $theArray1menus[12][0] == 8 OR $theArray1menus[13][0] == 8 OR $theArray1menus[14][0] == 8 ) { ?>
+  <li>
+  <a href="users.php">
+  <i class="fa fa-user"></i>Users</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 9 OR $theArray1menus[1][0] == 9 OR $theArray1menus[2][0] == 9 OR $theArray1menus[3][0] == 9 OR $theArray1menus[4][0] == 9 OR $theArray1menus[5][0] == 9 OR $theArray1menus[6][0] ==9  OR $theArray1menus[7][0] == 9 OR $theArray1menus[8][0] == 9 OR $theArray1menus[9][0] == 9 OR $theArray1menus[10][0] == 9 OR $theArray1menus[11][0] == 9 OR $theArray1menus[12][0] == 9 OR $theArray1menus[13][0] == 9 OR $theArray1menus[14][0] == 9) { ?>
+  <li>
+  <a href="blacklist.php">
+  <i class="fa fa-map-marker-alt"></i>BlackList</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 10 OR $theArray1menus[1][0] == 10 OR $theArray1menus[2][0] == 10 OR $theArray1menus[3][0] == 10 OR $theArray1menus[4][0] == 10 OR $theArray1menus[5][0] == 10 OR $theArray1menus[6][0] == 10 OR $theArray1menus[7][0] == 10 OR $theArray1menus[8][0] == 10 OR $theArray1menus[9][0] == 10 OR $theArray1menus[10][0] == 10 OR $theArray1menus[11][0] == 10 OR $theArray1menus[12][0] == 10 OR $theArray1menus[13][0] == 10 OR $theArray1menus[14][0] == 10) { ?>
+  <li>
+  <a href="reports.php">
+  <i class="fa fa-map-marker"></i>Reports</a>
+  </li>
+  <?php } ?>
+
+  <?php /*if($theArray1menus[0][0] == 11 OR $theArray1menus[1][0] == 11 OR $theArray1menus[2][0] == 11 OR $theArray1menus[3][0] == 11 OR $theArray1menus[4][0] == 11 OR $theArray1menus[5][0] == 11 OR $theArray1menus[6][0] == 11 OR $theArray1menus[7][0] == 11 OR $theArray1menus[8][0] == 11 OR $theArray1menus[9][0] == 11 OR $theArray1menus[10][0] == 11 OR $theArray1menus[11][0] == 11 OR $theArray1menus[12][0] == 11 OR $theArray1menus[13][0] == 11 OR $theArray1menus[14][0] == 11) { ?>
+  <li>
+  <a href="#">
+  <i class="fa fa-envelope"></i>Messaging</a>
+  </li>
+  <?php } */?>
+
+  <?php/* if($theArray1menus[0][0] == 12 OR $theArray1menus[1][0] == 12 OR $theArray1menus[2][0] == 12 OR $theArray1menus[3][0] == 12 OR $theArray1menus[4][0] == 12 OR $theArray1menus[5][0] == 12 OR $theArray1menus[6][0] == 12 OR $theArray1menus[7][0] == 12 OR $theArray1menus[8][0] == 12 OR $theArray1menus[9][0] == 12 OR $theArray1menus[10][0] == 12 OR $theArray1menus[11][0] == 12 OR $theArray1menus[12][0] == 12 OR $theArray1menus[13][0] == 12 OR $theArray1menus[14][0] == 12) { ?>
+  <li>
+  <a href="phonenumbers.php">
+  <i class="fa fa-phone"></i>Phone Numbers</a>
+  </li>
+  <?php } */?>
+
+  <?php if($theArray1menus[0][0] == 13 OR $theArray1menus[1][0] == 13 OR $theArray1menus[2][0] == 13 OR $theArray1menus[3][0] == 13 OR $theArray1menus[4][0] == 13 OR $theArray1menus[5][0] == 13 OR $theArray1menus[6][0] == 13 OR $theArray1menus[7][0] == 13 OR $theArray1menus[8][0] == 13 OR $theArray1menus[9][0] == 13 OR $theArray1menus[10][0] == 13 OR $theArray1menus[11][0] == 13 OR $theArray1menus[12][0] == 13 OR $theArray1menus[13][0] == 13 OR $theArray1menus[14][0] == 13) { ?>
+  <li>
+  <a href="client.php">
+  <i class="fa fa-user"></i>Manage Clients</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 14 OR $theArray1menus[1][0] == 14 OR $theArray1menus[2][0] == 14 OR $theArray1menus[3][0] == 14 OR $theArray1menus[4][0] == 14 OR $theArray1menus[5][0] == 14 OR $theArray1menus[6][0] == 14 OR $theArray1menus[7][0] == 14 OR $theArray1menus[8][0] == 14 OR $theArray1menus[9][0] == 14 OR $theArray1menus[10][0] == 14 OR $theArray1menus[11][0] == 14 OR $theArray1menus[12][0] == 14 OR $theArray1menus[13][0] == 14 OR $theArray1menus[14][0] == 14 ) { ?>
+  <li>
+  <a href="#">
+  <i class="fa fa-microphone"></i>Manage IVR</a>
+  </li>
+  <?php } ?>
+
+  </ul>
+  </div>
+  </nav>
+  </header>
+
+  <aside class="menu-sidebar d-none d-lg-block">
+  <div class="logo">
+    <span class="mini_logo"><img src="resources/images/mini_logo.png" alt="mini logo" /></span>
+  <a class="full_logo" href="">
+  <img src="resources/images/BigPbx-logo-_Color.png" style="width: 165px;" alt="logo" />
+  </a>
+
+  </div>
+  <div class="menu-sidebar__content js-scrollbar1">
+  <nav class="navbar-sidebar">
+  <ul class="list-unstyled navbar__list">
+  <?php if($theArray1menus[0][0] == 1 OR $theArray1menus[1][0] == 1 OR $theArray1menus[2][0] == 1 OR $theArray1menus[3][0] == 1 OR $theArray1menus[4][0] == 1 OR $theArray1menus[5][0] == 1 OR $theArray1menus[6][0] ==1  OR $theArray1menus[7][0] == 1 OR $theArray1menus[8][0] == 1 OR $theArray1menus[9][0] == 1 OR $theArray1menus[10][0] == 1 OR $theArray1menus[11][0] == 1 OR $theArray1menus[12][0] == 1 OR $theArray1menus[13][0] == 1 OR $theArray1menus[14][0] == 1) { ?>
+  <li class="">
+  <a href="dashboard.php" target="_blanck">
+  <i class="fa fa-tachometer"></i> <span>Dashboard</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 2 OR $theArray1menus[1][0] == 2 OR $theArray1menus[2][0] == 2 OR $theArray1menus[3][0] == 2 OR $theArray1menus[4][0] == 2 OR $theArray1menus[5][0] == 2 OR $theArray1menus[6][0] ==2  OR $theArray1menus[7][0] == 2 OR $theArray1menus[8][0] == 2 OR $theArray1menus[9][0] == 2 OR $theArray1menus[10][0] == 2 OR $theArray1menus[11][0] == 2 OR $theArray1menus[12][0] == 2 OR $theArray1menus[13][0] == 2 OR $theArray1menus[14][0] == 2 ) { ?>
+  <li class="has-sub" id="menu2">
+  <a href="lives.php">
+  <i class="fa fa-podcast"></i> <span>TextRicks Live</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li class="has-sub" id="menu3">
+  <a href="queue.php">
+  <i class="fa fa-quora" aria-hidden="true"></i>Manage Queue</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li class="has-sub" id="menu3">
+  <a href="ring.php">
+  <i class="fa fa-tty" aria-hidden="true"></i>Manage Ring</a>
+  </li>
+  <?php } ?>
+
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li>
+  <a href="conference.php">
+  <i class="fa fa-users" aria-hidden="true"></i>Manage Conference</a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 3 OR $theArray1menus[2][0] == 3 OR $theArray1menus[3][0] == 3 OR $theArray1menus[4][0] == 3 OR $theArray1menus[5][0] == 3 OR $theArray1menus[6][0] ==3  OR $theArray1menus[7][0] == 3 OR $theArray1menus[8][0] == 3 OR $theArray1menus[9][0] == 3 OR $theArray1menus[10][0] == 3 OR $theArray1menus[11][0] == 3 OR $theArray1menus[12][0] == 3 OR $theArray1menus[13][0] == 3 OR $theArray1menus[14][0] == 3) { ?>
+  <li class="has-sub" id="menu3">
+  <a href="did.php">
+  <i class="fa fa-diamond" aria-hidden="true"></i>Manage DID</a>
+  </li>
+  <?php } ?>
+
+
+  <?php /*if($theArray1menus[0][0] == 3 OR $theArray1menus[1][0] == 15 OR $theArray1menus[2][0] == 15 OR $theArray1menus[3][0] == 15 OR $theArray1menus[4][0] == 15 OR $theArray1menus[5][0] == 15 OR $theArray1menus[6][0] ==15  OR $theArray1menus[7][0] == 15 OR $theArray1menus[8][0] == 15 OR $theArray1menus[9][0] == 15 OR $theArray1menus[10][0] == 15 OR $theArray1menus[11][0] == 15 OR $theArray1menus[12][0] == 15 OR $theArray1menus[13][0] == 15 OR $theArray1menus[14][0] == 15 ) { ?>
+  <li class="has-sub" id="menu3">
+  <a href="campaign.php">
+  <i class="fa fa-quora" aria-hidden="true"></i>Manage Campaign</a>
+  </li>
+  <?php } */?>
+
+  <?php if($theArray1menus[0][0] == 4 OR $theArray1menus[1][0] == 4 OR $theArray1menus[2][0] == 4 OR $theArray1menus[3][0] == 4 OR $theArray1menus[4][0] == 4 OR $theArray1menus[5][0] == 4 OR $theArray1menus[6][0] ==4  OR $theArray1menus[7][0] == 4 OR $theArray1menus[8][0] == 4 OR $theArray1menus[9][0] == 4 OR $theArray1menus[10][0] == 4 OR $theArray1menus[11][0] == 4 OR $theArray1menus[12][0] == 4 OR $theArray1menus[13][0] == 4 OR $theArray1menus[14][0] == 4) { ?>
+  <li class="has-sub" id="menu4">
+  <a href="extension.php">
+  <i class="fa fa-etsy"></i> <span>Manage Extension</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 5 OR $theArray1menus[1][0] == 5 OR $theArray1menus[2][0] == 5 OR $theArray1menus[3][0] == 5 OR $theArray1menus[4][0] == 5 OR $theArray1menus[5][0] == 5 OR $theArray1menus[6][0] ==5  OR $theArray1menus[7][0] == 5 OR $theArray1menus[8][0] == 5 OR $theArray1menus[9][0] == 5 OR $theArray1menus[10][0] == 5 OR $theArray1menus[11][0] == 5 OR $theArray1menus[12][0] == 5 OR $theArray1menus[13][0] == 5 OR $theArray1menus[14][0] == 5) { ?>
+  <li class="has-sub" id="menu5">
+  <a href="inbound.php">
+  <i class="fa fa-calendar"></i> <span>Inbound Destination</span></a>
+  </li>
+  <?php } ?>
+
+  <?php /*if($theArray1menus[0][0] == 6 OR $theArray1menus[1][0] == 6 OR $theArray1menus[2][0] == 6 OR $theArray1menus[3][0] == 6 OR $theArray1menus[4][0] == 6 OR $theArray1menus[5][0] == 6 OR $theArray1menus[6][0] ==6  OR $theArray1menus[7][0] == 6 OR $theArray1menus[8][0] == 6 OR $theArray1menus[9][0] == 6 OR $theArray1menus[10][0] == 6 OR $theArray1menus[11][0] == 6 OR $theArray1menus[12][0] == 6 OR $theArray1menus[13][0] == 6 OR $theArray1menus[14][0] == 6) { ?>
+  <li class="has-sub" id="menu6">
+  <a href="outboundroute.php">
+  <i class="fa fa-opera"></i> <span>Outbound Route</span></a>
+  </li>
+  <?php } */?>
+
+  <?php /*if($theArray1menus[0][0] == 7 OR $theArray1menus[1][0] == 7 OR $theArray1menus[2][0] == 7 OR $theArray1menus[3][0] == 7 OR $theArray1menus[4][0] == 7 OR $theArray1menus[5][0] == 7 OR $theArray1menus[6][0] ==7  OR $theArray1menus[7][0] == 7 OR $theArray1menus[8][0] == 7 OR $theArray1menus[9][0] == 7 OR $theArray1menus[10][0] == 7 OR $theArray1menus[11][0] == 7 OR $theArray1menus[12][0] == 7 OR $theArray1menus[13][0] == 7 OR $theArray1menus[14][0] == 7) { ?>
+  <li class="has-sub" id="menu7">
+  <a href="">
+  <i class="fa fa-map-marker"></i> <span>Trunk</span></a>
+  </li>
+  <?php } */?>
+
+  <?php if($theArray1menus[0][0] == 8 OR $theArray1menus[1][0] == 8 OR $theArray1menus[2][0] == 8 OR $theArray1menus[3][0] == 8 OR $theArray1menus[4][0] == 8 OR $theArray1menus[5][0] == 8 OR $theArray1menus[6][0] ==8  OR $theArray1menus[7][0] == 8 OR $theArray1menus[8][0] == 8 OR $theArray1menus[9][0] == 8 OR $theArray1menus[10][0] == 8 OR $theArray1menus[11][0] == 8 OR $theArray1menus[12][0] == 8 OR $theArray1menus[13][0] == 8 OR $theArray1menus[14][0] == 8) { ?>
+  <li class="has-sub" id="menu8">
+  <a href="users.php">
+  <i class="fa fa-user"></i> <span>Users</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 9 OR $theArray1menus[1][0] == 9 OR $theArray1menus[2][0] == 9 OR $theArray1menus[3][0] == 9 OR $theArray1menus[4][0] == 9 OR $theArray1menus[5][0] == 9 OR $theArray1menus[6][0] ==9  OR $theArray1menus[7][0] == 9 OR $theArray1menus[8][0] == 9 OR $theArray1menus[9][0] == 9 OR $theArray1menus[10][0] == 9 OR $theArray1menus[11][0] == 9 OR $theArray1menus[12][0] == 9 OR $theArray1menus[13][0] == 9 OR $theArray1menus[14][0] == 9) { ?>
+  <li class="has-sub" id="menu9">
+  <a href="blacklist.php">
+  <i class="fa fa-lock"></i> <span>BlackList</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 10 OR $theArray1menus[1][0] == 10 OR $theArray1menus[2][0] == 10 OR $theArray1menus[3][0] == 10 OR $theArray1menus[4][0] == 10 OR $theArray1menus[5][0] == 10 OR $theArray1menus[6][0] == 10 OR $theArray1menus[7][0] == 10 OR $theArray1menus[8][0] == 10 OR $theArray1menus[9][0] == 10 OR $theArray1menus[10][0] == 10 OR $theArray1menus[11][0] == 10 OR $theArray1menus[12][0] == 10 OR $theArray1menus[13][0] == 10 OR $theArray1menus[14][0] == 10) { ?>
+  <li class="has-sub" id="menu10">
+  <a href="reports.php">
+  <i class="fa fa-flag"></i> <span>Reports</span></a>
+  </li>
+  <?php } ?>
+
+  <?php /*if($theArray1menus[0][0] == 11 OR $theArray1menus[1][0] == 11 OR $theArray1menus[2][0] == 11 OR $theArray1menus[3][0] == 11 OR $theArray1menus[4][0] == 11 OR $theArray1menus[5][0] == 11 OR $theArray1menus[6][0] == 11 OR $theArray1menus[7][0] == 11 OR $theArray1menus[8][0] == 11 OR $theArray1menus[9][0] == 11 OR $theArray1menus[10][0] == 11 OR $theArray1menus[11][0] == 11 OR $theArray1menus[12][0] == 11 OR $theArray1menus[13][0] == 11 OR $theArray1menus[14][0] == 11 ) { ?>
+  <li class="has-sub" id="menu11">
+  <a href="#">
+  <i class="fa fa-envelope"></i> <span>Messaging</span></a>
+  </li>
+  <?php } */?>
+
+  <?php /*if($theArray1menus[0][0] == 12 OR $theArray1menus[1][0] == 12 OR $theArray1menus[2][0] == 12 OR $theArray1menus[3][0] == 12 OR $theArray1menus[4][0] == 12 OR $theArray1menus[5][0] == 12 OR $theArray1menus[6][0] == 12 OR $theArray1menus[7][0] == 12 OR $theArray1menus[8][0] == 12 OR $theArray1menus[9][0] == 12 OR $theArray1menus[10][0] == 12 OR $theArray1menus[11][0] == 12 OR $theArray1menus[12][0] == 12 OR $theArray1menus[13][0] == 12 OR $theArray1menus[14][0] == 12) { ?>
+  <li class="has-sub" id="menu12">
+  <a href="phonenumbers.php">
+  <i class="fa fa-phone"></i> <span>Phone Numbers</span></a>
+  </li>
+  <?php } */?>
+
+  <?php if($theArray1menus[0][0] == 13 OR $theArray1menus[1][0] == 13 OR $theArray1menus[2][0] == 13 OR $theArray1menus[3][0] == 13 OR $theArray1menus[4][0] == 13 OR $theArray1menus[5][0] == 13 OR $theArray1menus[6][0] == 13 OR $theArray1menus[7][0] == 13 OR $theArray1menus[8][0] == 13 OR $theArray1menus[9][0] == 13 OR $theArray1menus[10][0] == 13 OR $theArray1menus[11][0] == 13 OR $theArray1menus[12][0] == 13 OR $theArray1menus[13][0] == 13 OR $theArray1menus[14][0] == 13) { ?>
+  <li class="has-sub" id="menu13">
+  <a href="client.php">
+  <i class="fa fa-user"></i> <span>Manage Clients</span></a>
+  </li>
+  <?php } ?>
+
+  <?php if($theArray1menus[0][0] == 14 OR $theArray1menus[1][0] == 14 OR $theArray1menus[2][0] == 14 OR $theArray1menus[3][0] == 14 OR $theArray1menus[4][0] == 14 OR $theArray1menus[5][0] == 14 OR $theArray1menus[6][0] == 14 OR $theArray1menus[7][0] == 14 OR $theArray1menus[8][0] == 14 OR $theArray1menus[9][0] == 14 OR $theArray1menus[10][0] == 14 OR $theArray1menus[11][0] == 14 OR $theArray1menus[12][0] == 14 OR $theArray1menus[13][0] == 14 OR $theArray1menus[14][0] == 14) { ?>
+  <li class="has-sub" id="menu14">
+  <a href="">
+  <i class="fa fa-microphone"></i> <span>Manage IVR</span></a>
+  </li>
+  <?php } ?>
+  <br>
+
+  </ul>
+  </nav>
+  </div>
+  </aside>
+  <div class="page-container"> 
+  <style>
+  #queryNumber {border: 1px solid gainsboro;padding: 6px 0 6px 10px;}	
+  #getQueryBtn {float: left;margin: 0 20px 0 5px;padding: 6px 15px;background: #2aa9de;color: white;}
+  @media(max-width:767px){ #queryNumber, #getQueryBtn {display:none} }
+  </style>
+
+  <header class="header-desktop">
+  <div class="section__content section__content--p30">
+  <div class="container-fluid">
+  <div class="header-wrap">
+    <div class="left_slide_icon">
+      
+      <i class="fa fa-bars zmdi zmdi-menu show_btn_togle" aria-hidden="true"></i>
+      <i class="fa fa-bars zmdi zmdi-menu close_btn_togle" aria-hidden="true"></i>
+    </div>
+
+
+  <div class="header-button">
+    <!--
+  <input type="text" placeholder="Enter Phone No"  class="numbersOnly" id="queryNumber" />
+  <input type="button" value="Get Query" id="getQueryBtn" />
+  -->
+  <div class="account-wrap">
+  <div class="account-item clearfix js-item-menu">
+  <div class="image">
+  <span><?php echo substr($currentlogin_user,0,1); ?></span>
+  </div>
+  <div class="content">
+  <a class="js-acc-btn" href="#"><?php echo $currentlogin_user; ?></a>
+  </div>
+  <div class="account-dropdown js-dropdown">
+  <div class="info clearfix">
+  <div class="image">
+  <a href="#">
+
+  <span><?php echo substr($currentlogin_user,0,1); ?></span>
+  </a>
+  </div>
+  <div class="content">
+  <h5 class="name">
+  <a href="#"><?php echo $currentlogin_user; ?></a>
+  </h5>
+  <!-- <span class="email"><a href="#" class="__cf_email__" data-cfemail="9ff5f0f7f1fbf0fadffae7fef2eff3fab1fcf0f2">[email&#160;protected]</a></span>  -->
+  </div>
+  </div>
+
+  <div class="account-dropdown__footer">
+  <!--<a href="resetpassword.php">-->
+  <a href="#">
+  <i class="fa fa-sign-out zmdi zmdi-power" aria-hidden="true"></i> Reset Password</a>
+  </div>
+  <div class="account-dropdown__footer">
+  <a href="logout.php">
+  <i class="fa fa-sign-out zmdi zmdi-power" aria-hidden="true"></i> Logout</a>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </div>
+  </header>
+
+  <div id="myModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      
+    <form name="" method="post">
+        <!-- Modal body -->
+      <div class="modal-body">
+          <select name="barge" id="barge" class="form-control">
+      <option value="">Please Select </option>
+      <?php while($rowbarge = mysqli_fetch_array($result_barge)) { ?>
+      <option value="<?php echo $rowbarge['name']; ?>" > <?php echo $rowbarge['name']; ?> </option>
+      <?php } ?>
+      </select>
+    </div>
+  <input type="hidden" id="hidden_ext" name="hidden_ext" value="">
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          <input type="button" value="Confirm" onclick="getBargeCall()" class="btn btn-primary" >
+        </div>
+  </form>
+      
+      </div>
+    </div>
+  </div>
+
+  <script>
+  function getId(id)
+  {
+    $('.modal').modal('toggle')
+    $('.modal-title').html('Call Barge '+id);
+    $("#hidden_ext").val(id);
+    
+  }
+
+
+  function getBargeCall()
+      {
+        var barge=$("#barge").val();
+        var hidden_ext=$("#hidden_ext").val();
+        
+  $.ajax({  
+      type: "POST",  
+      url: "bargeAjax.php",  
+      data: {barge:barge,hidden_ext:hidden_ext},  
+      success: function(value) {  
+              $("#data").html(value);
+      }
+  });
+  $("#myModal").modal('hide');
+      }
+  </script>

@@ -1,0 +1,13 @@
+Disk Space:
+
+Memory Usage:
+
+Timezone:
+
+Uptime:
+
+CPU Usage:
+
+Bandwidth:
+
+Total Bandwidth:

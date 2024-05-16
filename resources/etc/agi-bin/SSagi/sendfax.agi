@@ -1,0 +1,39 @@
+#!/usr/bin/php -q
+<?php
+require_once "phpagi/phpagi.php";
+            $ini_array = parse_ini_file("/etc/iglobal.conf");
+            $connA = mysql_connect($ini_array["hostname"], $ini_array["user"], $ini_array["password"]);
+            mysql_select_db($ini_array["dbname"], $connA);
+
+pcntl_signal(SIGHUP, SIG_IGN);
+set_time_limit(30);
+ error_reporting(E_ALL);
+$AGI = new AGI();
+
+/*
+if ($argc > 1 && is_numeric($argv[1]) && $argv[1] >= 0) {
+        $confno = $argv[1];
+}
+$admin= $argv[2];
+$confpin=$argv[3];
+*/
+$did=$AGI->request['agi_extension'];
+$AGI->verbose("DID: $did");
+
+$q1="select username,email,firstname,lastname from cc_card where id in(select iduser from cc_did where did='$did')";
+$AGI->verbose("Query: $q1");
+$res1=mysql_query($q1);
+$d1=mysql_fetch_assoc($res1);
+$account=$d1['username'];
+$email=$d1['email'];
+$fname=$d1['firstname'];
+$lname=$d1['lastname'];
+$name=$fname." ".$lname;
+$AGI->set_variable('name', $name);
+$AGI->verbose("Accountcode $account)");
+$AGI->set_variable('CDR(accountcode)', $account);
+$AGI->verbose("email $email)");
+$AGI->set_variable('email', $email);
+
+?>
+

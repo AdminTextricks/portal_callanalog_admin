@@ -1,0 +1,58 @@
+#!/usr/bin/php -q
+
+<?php
+
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
+
+declare(ticks = 1);
+if (function_exists('pcntl_signal')) {
+    pcntl_signal(SIGHUP, SIG_IGN);
+}
+error_reporting(E_ALL ^ (E_NOTICE | E_WARNING));
+require ('/var/www/html/iglobal/AGI/lib/phpagi/phpagi.php'); // I do not know if it's really necessary, as I said at the beginning, I know very little about PHP and AGI
+
+error_reporting (E_ALL);
+
+        $conexion = mysql_connect("localhost","root","tumko34h1se");
+        mysql_select_db("iglobal",$conexion);
+
+        $agi=new AGI();
+        $no=preg_replace("#[^0-9]#","",$agi->request[agi_callerid]);
+	$exten=$agi->request[agi_extension];
+        $lock_pin=$_SERVER['argv'][1];
+        $username=$_SERVER['argv'][2];
+        $permiso=$_SERVER['argv'][3];
+
+        $cConsulta = "select username,lock_pin,id_group,".$permiso." from cc_card where lock_pin = '".$lock_pin."'";
+        $rsConsulta = mysql_query($cConsulta);
+        $result = mysql_fetch_array($rsConsulta);
+
+        $agi -> Noop($cConsulta);
+
+        if ($result['lock_pin']!="") {
+
+                if ($result['id_group']=="1" and $result['lock_pin']==$lock_pin and $result[$permiso]=="1") {
+                        //ok
+                        $agi -> set_variable("Continua","1");
+                }
+
+                elseif ($result['id_group']==="0" and $result[$permiso]=="1") {
+                        //ok
+                        $agi -> set_variable("Continua","1");
+                }
+
+                elseif ($result['useralias']!=$ext and $result['id_group']=="1") {
+                        //No tiene permisos
+                        $agi -> set_variable("Continua","2");
+                }
+
+                elseif ($result[$permiso]=="0") {
+                        //No tiene permisos
+                        $agi -> set_variable("Continua","2");
+                }
+        }
+        else{
+                //pin incorrect
+                $agi -> set_variable("Continua","3");
+        }
+

@@ -1,0 +1,190 @@
+#!/usr/bin/php -q
+<?php
+require_once "phpagi/phpagi.php";
+            $ini_array = parse_ini_file("/etc/iglobal.conf");
+            $connA = mysql_connect($ini_array["hostname"], $ini_array["user"], $ini_array["password"]);
+            mysql_select_db($ini_array["dbname"], $connA);
+
+pcntl_signal(SIGHUP, SIG_IGN);
+set_time_limit(30);
+  error_reporting(E_ALL);
+$AGI = new AGI();
+
+
+
+
+    function validate_date($AGI,$day_start, $day_stop, $starttime, $stoptime) {
+        $compare_day = date('D');
+        $lcd = strtolower($compare_day);
+        $lds = strtolower($day_start);
+        $ldst = strtolower($day_stop);
+$AGI->verbose("In validate_date  compare day :$lcd,startday: $lds,stop day:$ldst");
+        if ($lcd == $lds || $lcd == $ldst) {
+            $temp = explode(':', $starttime);
+            $h = $temp[0];
+            $m = $temp[1];
+            $stm = $h * 60 + $m;
+
+            $temp2 = explode(':', $stoptime);
+            $he = $temp2[0];
+            $me = $temp2[1];
+            $etm = $he * 60 + $me;
+
+            $now = date('H:i');
+            $temp3 = explode(':', $now);
+            $hn = $temp3[0];
+            $mn = $temp3[1];
+            $ntm = $hn * 60 + $mn;
+
+                $AGI->verbose("In validate_date  compare day :$lcd is same as start or end day");
+
+            if ($ntm >= $stm && $ntm <= $etm) {
+                return 1;
+            }
+        }
+        $last_start_day = 'last' . " " . $day_start;
+        $last_stop_day = 'last' . " " . $day_stop;
+        $next_stop_day = 'next' . " " . $day_stop;
+
+        $AGI->verbose("In validate compare day :$lcd,  last startday: $last_start_day ,last stop day:$last_stop_day , next stop day :  $next_stop_day");
+        $today = date('m/d/y');
+        $start = date('d', strtotime($last_start_day, strtotime($today)));
+        $start_date = date('m/d/y', strtotime($last_start_day, strtotime($today)));
+        $start_date_time = $start_date . " " . $starttime;
+        $end = date('d', strtotime($last_stop_day, strtotime($today)));
+
+
+$AGI->verbose("In validate_date  compare day :$lcd, Today: $today, start: $start, start_date: $start_date, start_date_time: $start_date_time ,end : $end");
+
+        if ($start > $end) {
+            $end_date = date('m/d/y', strtotime($next_stop_day, strtotime($today)));
+            $end_date_time = $end_date . " " . $stoptime;
+                $AGI->verbose("In validate_date  compare day :$lcd , end_date_time: $end_date_time,stop time: $stoptime ");
+        } else {
+            $end_date = date('m/d/y', strtotime($last_stop_day, strtotime($today)));
+            $end_date_time = $end_date . " " . $stoptime;
+                $AGI->verbose("In validate_date  compare day :$lcd , end_date_time: $end_date_time,stop time: $stoptime ");
+        }
+        $today_date = date('m/d/y h:i');
+        $date_today = strtotime($today_date);
+        $date_start = strtotime($start_date_time);
+        $date_end = strtotime($end_date_time);
+        $AGI->verbose("In validate_date  compare day :$lcd ,date_today:$date_today, date_start: $date_start, date_stop: $date_end  ");
+        if (($date_today >= $date_start) && ($date_today <= $date_end)) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+class me{
+function play_ivr($AGI,$file,$id_ivr,$card_id)
+{
+sleep(1);
+$AGI->verbose("START PLAY Function : $file,$id_ivr,$card_id");
+//$AGI->exec("Read","$input,$file,1,,3,10000");
+$AGI->exec("Read", "input,$file,1,,3,30");
+$AGI->verbose("In PLAY IVR FUNCTION $input");
+$temp = $AGI->get_variable("input");
+$digits = trim($temp["data"]);
+$AGI->verbose("In PLAY IVR FUNCTION $digits");
+
+$q4="select * from cc_va_route where id_cc_card='$card_id' and id_va_ivr='$id_ivr' and digit='$digits'";
+$r4=mysql_query($q4);
+$d4=mysql_fetch_assoc($r4);
+$route_id=$d4['id'];
+$action=$d4['action'];
+$action_data=$d4['action_data'];
+
+$AGI->verbose("In PLAY IVR FUNCTION: Digits: $digits, Route_id=$route_id,Action:$action,Action data : $action_data");
+$exten=$AGI->request['agi_exten'];
+if($action=='vm')
+{
+$AGI->exec("Goto","vmmain,$exten,1");
+}
+if($action=='conf')
+{
+$AGI->exec("Goto","meetmein,$exten,1");
+}
+if($action=='number')
+{
+$AGI->exec("Goto","va-Celular,$action_data,1");
+}
+if($action=='ivr')
+{
+
+$q5="select id,voice_file from cc_va_ivr where id_cc_card='$card_id' and name='$action_data'";
+$r5=mysql_query($q5);
+$d5=mysql_fetch_assoc($r5);
+
+$id_ivr=$d5['id'];
+$myfile=$d5['voice_file'];
+$tmp=explode(".",$myfile);
+$myfile=$tmp[0];
+$file="/var/www/html/bigpbx/customer/".$myfile;
+//$file="/var/www/html/iglobal/customer/vids_ivr_demo";
+$AGI->verbose("---------------- -----------------------------");
+$AGI->verbose("Repeat Play Function : $file,$id_ivr,$card_id");
+$this->play_ivr($AGI, $file,$id_ivr,$card_id);
+
+}
+
+}
+
+}
+$did=$AGI->request['agi_extension'];
+//$q1="select username,id from cc_card where id in(select iduser from cc_did where did='$did')";
+$q1="select cc_card.username,cc_card.id,cc_did.id_ivr from cc_card,cc_did where cc_card.id=cc_did.iduser and cc_did.did='$did'";
+$AGI->verbose("Query: $q1)");
+$res1=mysql_query($q1);
+$d1=mysql_fetch_assoc($res1);
+$account=$d1['username'];
+$card_id=$d1['id'];
+$id_ivr=$d1['id_ivr'];
+
+$AGI->verbose("Accountcode $account)");
+$AGI->set_variable('CDR(accountcode)', $account);
+
+$q2="select * from cc_va_ivr where id_cc_card='$card_id' and id='$id_ivr'";
+$r2=mysql_query($q2);
+$d2=mysql_fetch_assoc($r2);
+$ivr_name=$d2['name'];
+$sch_call=$d2['sch_call'];
+$s_day=$d2['startday'];
+$st_day=$d2['stopday'];
+$s_time=$d2['starttime'];
+$st_time=$d2['stoptime'];
+$file=$d2['voice_file'];
+$tmp=explode(".",$file);
+$file=$tmp[0];
+$file="/var/www/html/bigpbx/customer/".$file;
+$AGI->verbose("Query: $q2)");
+
+$AGI->verbose("schedule enabled? $sch_call, $s_day,$st_day,$s_time,$st_time ");
+
+if($sch_call=='no')
+{
+$AGI->verbose("disabled-- valid time ? $valid_time ");
+$valid_time=1;
+}// schedule disabled continue with IVR
+elseif($sch_call=='yes')
+{
+$AGI->verbose("schedule is enabled-- $sch_call, $s_day,$st_day,$s_time,$st_time ");
+$AGI->verbose("schedule is enabled check date validation");
+$valid_time=validate_date($AGI,$s_day,$st_day,$s_time,$st_time);
+}// ivr schedule enabled check if allow at present
+
+
+$AGI->verbose("schedule enabled? $sch_call, $s_day,$st_day,$s_time,$st_time ");
+$AGI->verbose("disabled-- valid time ? $valid_time ");
+
+if($valid_time=='1')
+{
+$AGI->verbose("valid time ? $valid_time ");
+$m=NEW me();
+$m->play_ivr($AGI,$file,$id_ivr,$card_id);
+}//time allowed to make call
+$AGI->verbose("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+
+?>
+

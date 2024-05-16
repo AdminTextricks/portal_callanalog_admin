@@ -1,0 +1,94 @@
+#!/usr/bin/php -q
+<?php
+require_once "phpagi/phpagi.php";
+            $ini_array = parse_ini_file("/etc/iglobal.conf");
+            $connA = mysql_connect($ini_array["hostname"], $ini_array["user"], $ini_array["password"]);
+            mysql_select_db($ini_array["dbname"], $connA);
+
+pcntl_signal(SIGHUP, SIG_IGN);
+set_time_limit(30);
+  error_reporting(E_ALL);
+$AGI = new AGI();
+//$AGI->debug("conf-background.agi", 1);
+
+/*
+$argc=3;
+$argv[1]='6391';
+$argv[2]=0;
+$argv[3]=47256;
+*/
+
+
+if ($argc > 1 && is_numeric($argv[1]) && $argv[1] >= 0) {
+        $confno = $argv[1];
+}
+$admin= $argv[2];
+$confpin=$argv[3];
+//$did=$AGI->request['extension'];
+$did=$AGI->request['agi_extension'];
+//$did='18162970239';
+$q1="select username from cc_card where id in(select iduser from cc_did where did='$did')";
+$AGI->verbose("Query: $q1)");
+$res1=mysql_query($q1);
+$d1=mysql_fetch_assoc($res1);
+$account=$d1['username'];
+$AGI->verbose("Accountcode $account)");
+$AGI->set_variable('CDR(accountcode)', $account);
+
+
+$AGI->verbose("verbose this text $argv[2])");
+$AGI->verbose("CONF PIN $argv[3])");
+if($confpin >1  && is_numeric($confpin))
+{
+$cidnum = $AGI->request['agi_callerid'];
+$cidname = $AGI->request['agi_calleridname'];
+$exten=$AGI->request['agi_exten'];
+/*
+$exten='18162970239';
+$cidnum='320000';
+$cidname='320000';
+*/
+$AGI->verbose("Caller ID name is '$cidname' number is '$cidnum' conference number is $confno, exten:$exten,did:$did", 1);
+
+$q="select pin,adminpin from booking where confno='$confno' and pin='$confpin'";
+$res=mysql_query($q);
+$data=mysql_fetch_assoc($res);
+$pin=$data['pin'];
+$AGI->verbose("CONF PIN query :: $q");
+$AGI->verbose("CONF PIN from DB :: $pin");
+if($pin <='999')
+{
+$AGI->exec("Playback","conf-invalidpin");
+if($admin =='0')
+ {$AGI->exec("Goto","meetp,$exten,4");}
+if($admin =='1')
+{$AGI->exec("Goto","meet-admin,$exten,1");}
+}
+elseif($pin==$confpin)
+{
+$AGI->exec("Goto","meetp,$exten,8");
+}
+}
+else
+{
+// Caller ID info is stored in $request in AGI class, passed from Asterisk
+$cidnum = $AGI->request['agi_callerid'];
+$cidname = $AGI->request['agi_calleridname'];
+$exten=$AGI->request['exten'];
+$AGI->verbose("Caller ID name is '$cidname' number is '$cidnum' conference number is $confno", 1);
+
+$q="select pin,adminpin from booking where confno='$confno'";
+$res=mysql_query($q);
+$data=mysql_fetch_assoc($res);
+$pin=$data['pin'];
+if($pin <='999')
+{
+$AGI->exec("Playback","conf-invalid");
+if($admin =='0')
+ {$AGI->exec("Goto","meetp,$exten,1");}
+if($admin =='1')
+{$AGI->exec("Goto","meet-admin,$exten,1");}
+}
+}// for chekcing conf number
+?>
+

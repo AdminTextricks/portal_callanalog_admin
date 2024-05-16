@@ -1,0 +1,106 @@
+<?php require_once('header.php'); ?>
+
+<style>
+.unread{
+    background-color:#8FFFAF !important;
+}
+</style>
+<div class="main-content">
+    <div class="section__content section__content--p30 page_mid">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                <h2 class="title-1"> Notifications<span style="margin-left:50px;"></span></h2><br>
+                <?php
+                    if($_SESSION['userroleforpage'] == 1){
+                        $sql = "SELECT * FROM `user_activity_log` ORDER BY id DESC";
+                    }else{
+                        $sql = "SELECT * FROM `user_activity_log` WHERE `user_id` = '".$_SESSION['login_user_id']."' ORDER BY id DESC";
+                    }
+                    // echo $sql;exit;
+                        $result = mysqli_query($connection, $sql) or die("query failed : notification sql");
+                        if(mysqli_num_rows($result) > 0){
+                            ?>
+                         <div class="row">
+                            <div class="col-md-12">
+
+                            <div class="table-responsive table-responsive-data2 big_live_dtl manage_queue_table_outer">
+                        <table id="table-data" class='display dataTable table manage_queue_table'>
+                            <thead>
+                                <th>Serial No</th>
+                                <?php 
+                                if($_SESSION['userroleforpage'] == 1){
+                                ?>
+                                <th style="text-align:left;">User Name</th>
+                                <?php } ?>
+                                <th style="text-align:left;">Notification Type</th>
+                                <th style="text-align:left;">Message</th>
+                                <th style="text-align:left;">Date</th>
+                            </thead>
+                            <?php
+                            $i = 1;
+                            while($row = mysqli_fetch_assoc($result)){
+                                // echo "<pre>";  print_r($row); exit;
+                            ?>
+                            <tr class="tr-shadow <?php if(($_SESSION['userroleforpage'] == 1 &&  $row['admin_status'] == 0) || ($_SESSION['userroleforpage'] == 2 &&  $row['user_status'] == 0)){ echo "unread";} ?>">
+                                <td class="<?php if(($_SESSION['userroleforpage'] == 1 &&  $row['admin_status'] == 0) || ($_SESSION['userroleforpage'] == 2 &&  $row['user_status'] == 0)){ echo "unread";} ?>"><?php echo $i;?></td>
+                                <?php if($_SESSION['userroleforpage'] == 1){
+                                        if($row['user_id'] == 0){
+                                            $name = "Admin";
+                                        }else{
+                                            $query = "SELECT `name` FROM `users_login` WHERE `id` = '".$row['user_id']."'";
+                                            $result1 = mysqli_query($connection, $query) or die("query failed : Query users_login");
+                                            if(mysqli_num_rows($result1) > 0){
+                                                $row1 = mysqli_fetch_assoc($result1);
+                                                $name = $row1['name']; 
+                                            }
+                                        }    
+                                        // echo $query;exit;
+                                ?>
+                                <td style="text-align:left;"><?php echo $name;?></td>
+                                <?php } ?>
+                                <td style="text-align:left;"><?php echo $row['activity_type']; ?></td>
+                                <td style="text-align:left;"><?php echo $row['message'];?></td>
+                                <td style="text-align:left;"><?php echo $row['activity_time']; ?></td>
+                            </tr>
+                            
+                            <?php
+                           $i++;
+                     }
+                            ?>
+                            </table>
+                    </div>
+                    </div>
+                    </div>
+                         <?php
+                        }
+                    ?>
+                    <input type="hidden" name="" id="user_id" value="<?php echo $_SESSION['login_user_id']?>">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+       $(window).on("load", function(){
+                    var user_id = $("#user_id").val();
+                    // alert(user_id);
+                   setTimeout(function(){
+                     $.ajax({
+                        url : "ajaxnotification_update.php",
+                        type : "POST",
+                        data : {user_id : user_id},
+                        success : function(data){
+                             if(data){
+                                $("tr").removeClass("unread");
+                                $("td").removeClass("unread");
+                            }
+                        } 
+                    });
+                   }, 5000);
+        });
+         $('#table-data').DataTable();         
+    });
+</script>
+<?php require_once('footer.php'); ?> 
