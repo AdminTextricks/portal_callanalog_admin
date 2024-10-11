@@ -373,7 +373,7 @@ $result_queuebuddies = mysqli_query($connection, $query_queue_buddies);
 												<select name="extensionSelect[]" id="extensionSelect"
 													class="form-control-sm form-control" multiple="multiple">
 													<?php while ($row_buddies = mysqli_fetch_array($result_queuebuddies)) { ?>
-														<option onclick="getData()"
+														<option ondblclick="getData()"
 															value="<?php echo $row_buddies['name']; ?>">
 															<?php echo $row_buddies['name']; ?>
 														</option>

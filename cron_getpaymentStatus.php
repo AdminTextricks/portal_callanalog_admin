@@ -234,10 +234,10 @@ if (mysqli_num_rows($result) > 0) {
                     // echo 'Payment Status: ' . $responseData['payment_status'];
                     // Add more handling of payment status as needed
                 } /* else {
-                   echo 'HTTP Error: ' . $httpCode;
-                   // Print detailed cURL request/response information
-                   echo "\nResponse:\n$response\n";
-               } */
+                  echo 'HTTP Error: ' . $httpCode;
+                  // Print detailed cURL request/response information
+                  echo "\nResponse:\n$response\n";
+              } */
             }
             curl_close($curl);
 
@@ -305,15 +305,17 @@ if (mysqli_num_rows($result) > 0) {
                     user_activity_log($user_id, $client_id, $activity_type, $message);
                     $Status = 'Success';
                     $message = 'Payment has been done.';
-                }
-                make_pdf($invoice_id, $user_id);
-                $gatway_up = "UPDATE `gateways_payments` SET `payment_status` = 'Paid' WHERE `id` = '" . $gateway_invo_id . "'";
-                $result_gateway = mysqli_query($connection, $gatway_up) or die("Query failed : gatway_up");
-                $btc_upSql = "UPDATE `btc_gateways` SET `payment_status`='" . $responseData['payment_status'] . "' WHERE `payment_id` = '" . $payment_id . "'";
-                $result_btc = mysqli_query($connection, $btc_upSql) or die("query failed : btc_upSql");
 
-                $payment_log = 'BTC Payment Successful Notification--- Payment ID --> ' . $payment_id . ', Item Type -> ' . $item_type . ', Item --> ' . $item_number . ', Payment Status --> ' . $responseData['payment_status'];
-                wh_log($payment_log);
+                    make_pdf($invoice_id, $user_id);
+                    $gatway_up = "UPDATE `gateways_payments` SET `payment_status` = 'Paid' WHERE `id` = '" . $gateway_invo_id . "'";
+                    $result_gateway = mysqli_query($connection, $gatway_up) or die("Query failed : gatway_up");
+                    $btc_upSql = "UPDATE `btc_gateways` SET `payment_status`='" . $responseData['payment_status'] . "' WHERE `payment_id` = '" . $payment_id . "'";
+                    $result_btc = mysqli_query($connection, $btc_upSql) or die("query failed : btc_upSql");
+
+                    $payment_log = 'BTC Payment Successful Notification--- Payment ID --> ' . $payment_id . ', Item Type -> ' . $item_type . ', Item --> ' . $item_number . ', Payment Status --> ' . $responseData['payment_status'];
+                    wh_log($payment_log);
+                }
+
             } else {
                 $payment_log = 'BTC Payment Notification--- Payment ID --> ' . $payment_id . ', Item Type -> ' . $item_type . ', Item --> ' . $item_number . ', Payment Status --> ' . $responseData['payment_status'];
                 wh_log($payment_log);

@@ -135,7 +135,7 @@ async function checkStatus() {
 	let item_type 		= document.getElementById("item_type").value;
 	let customer_name 	= document.getElementById("name").value;
     let customer_email 	= document.getElementById("email").value;
-	
+	let renew_item	= document.getElementById("renew_item").value;
 	
     const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret);
     
@@ -146,7 +146,7 @@ async function checkStatus() {
                 fetch("payment_init.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ request_type:'payment_insert', payment_intent: paymentIntent, customer_id: customerID,user_id:user_id,gatway_invoice_id:gatway_invoice_id,invoice_id:invoice_id, payment_type:payment_type,item_name:item_name,item_number:item_number,item_type:item_type,stripeAmount:stripeAmount, stripeCurrency:stripeCurrency,customer_name:customer_name,customer_email:customer_email }),
+                    body: JSON.stringify({ request_type:'payment_insert', payment_intent: paymentIntent, customer_id: customerID,user_id:user_id,gatway_invoice_id:gatway_invoice_id,invoice_id:invoice_id, payment_type:payment_type,item_name:item_name,item_number:item_number,item_type:item_type,stripeAmount:stripeAmount, stripeCurrency:stripeCurrency,customer_name:customer_name,customer_email:customer_email,renew_item:renew_item }),
                 })
                 .then(response => response.json())
                 .then(data => {

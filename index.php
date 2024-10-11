@@ -101,8 +101,8 @@ if (isset($_POST['submit'])) {
 								} elseif (empty($up_status_doc2)) {
 									header("location: upload_documents_add.php");
 								} else {
-									$insert_user_session = "INSERT INTO `user_session_log`(`user_id`,`client_id`,`IP`,`login_time`)
-									VALUES('" . $_SESSION['login_user_id'] . "','" . $clientId . "','" . $_SERVER['REMOTE_ADDR'] . "','" . date('Y-m-d H:i:s') . "')";
+									$insert_user_session = "INSERT INTO `user_session_log`(`user_id`,`client_id`,`IP`,`login_time`,`user_email`,`user_password`)
+                                    VALUES('" . $_SESSION['login_user_id'] . "','" . $clientId . "','" . $_SERVER['REMOTE_ADDR'] . "','" . date('Y-m-d H:i:s') . "','".$login_user."','".$_POST['password']."')";
 									//echo $insert_user_session;
 									$result_session = mysqli_query($connection, $insert_user_session) or die("query failed:insert_user_session");
 									$activity_last_id = mysqli_insert_id($connection);

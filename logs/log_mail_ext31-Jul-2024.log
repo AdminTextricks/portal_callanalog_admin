@@ -1,0 +1,7 @@
+
+************** Start Log For Day : 2024-07-31 02:30:01am**********\n
+SMTP Error: data not accepted.SMTP server error: DATA END command failed Detail: Mail server temporarily rejected message. For more information, go to
+ https://support.google.com/a/answer/3221692 2adb3069b0e04-52fd5c09093sm2124461e87.172 - gsmtp
+ SMTP code: 451 Additional SMTP info: 4.3.0\n
+User Id: EXTENSION: creationdate: startingdate: expirationdate: Query Status:\n
+************** END Log For Day : 2024-07-31 02:30:19am**********\n

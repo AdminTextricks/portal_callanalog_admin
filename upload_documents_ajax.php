@@ -35,11 +35,11 @@ if(mysqli_num_rows($sel)>0 ){
 }
 
 ## Total number of records with filtering
-if($_SESSION['userroleforpage'] == 1){
-    $sel2 = "select count(*) as allcount from upload_documents crg WHERE 1  ".$searchQuery;
-    }else{
-    $sel2 = "select count(*) as allcount from upload_documents crg WHERE ".$searchQuery;
-    }
+if ($_SESSION['userroleforpage'] == 1) {
+  $sel2 = "select count(*) as allcount from upload_documents crg left join cc_card on crg.user_id=cc_card.id WHERE 1 " . $searchQuery;
+} else {
+  $sel2 = "select count(*) as allcount from upload_documents crg WHERE user_id=" . $user_id . "" . $searchQuery;
+}
     // echo"<pre>"; print_r($sel2);
     
     $sel2 = mysqli_query($con,$sel2);

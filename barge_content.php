@@ -156,7 +156,7 @@ function seconds2human_rohit($ss)
 						if ($_SESSION['userroleforpage'] == 1) {
 							$query_groupby = "select user_id from cc_live_calls group by user_id";
 						} else {
-							$query_groupby = "select user_id from cc_live_calls where user_id = '" . $_SESSION['login_user_id'] . "'";
+							$query_groupby = "select distinct(user_id) from cc_live_calls where user_id = '" . $_SESSION['login_user_id'] . "'";
 						}
 						$result_groupby = mysqli_query($connection, $query_groupby);
 						while ($row_groupby = mysqli_fetch_array($result_groupby)) {

@@ -11,6 +11,9 @@ $columnIndex = $_POST['order'][0]['column']; // Column index
 $columnName = $_POST['columns'][$columnIndex]['data']; // Column name
 $columnSortOrder = $_POST['order'][0]['dir']; // asc or desc
 $searchValue = mysqli_real_escape_string($con, $_POST['search']['value']); // Search value
+$ext_status = $_POST['ext_status'];
+$host = $_POST['host'];
+$expire_soon = $_POST['expire_days'];
 
 ## Search 
 $searchQuery = " ";
@@ -24,7 +27,18 @@ if ($searchValue != '') {
 }
 // $query_queue = "select cqt.queue_name as queue_name,cqt.name as name,Client.clientName as clientName, cqt.strategy as strategy, cqt.musicclass as musicclass , cqt.status as status from cc_queue_table cqt left join Client ON cqt.clientid=Client.clientId";
 // $result = mysqli_query($connection,$query_queue);
+if ($ext_status !== "" && $host !== "") {
+	$expired_sql = " and sip.ext_status='0' and sip.host='static'";
+} else {
+	$expired_sql = "";
+}
 
+
+if ($expire_soon == 3) {
+	$expiring_sql = " and (DATE(expirationdate) = DATE(NOW() + INTERVAL 2 DAY) OR DATE(expirationdate) = DATE(NOW() + INTERVAL 1 DAY) OR DATE(expirationdate) = DATE(NOW()))";
+} else {
+	$expiring_sql = "";
+}
 $queuenames_one = "SELECT cqt.name AS name FROM cc_queue_table cqt LEFT JOIN Client ON cqt.clientid = Client.clientId WHERE Client.clientId = '" . $_SESSION['userroleforclientid'] . "'";
 $resultqueue_one = mysqli_query($connection, $queuenames_one);
 
@@ -39,10 +53,10 @@ $queue_id = implode(",", $resultingsone);
 
 ## Total number of records without filtering
 if ($_SESSION['userroleforpage'] == 1) {
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies ");
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies where id_cc_card !=0");
 } else {
 	//$sel = mysqli_query($con,"select count(*) as allcount from cc_sip_buddies where accountcode =".$_SESSION['login_usernames']."");
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientID where sip.accountcode='" . $_SESSION['login_usernames'] . "'");
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientID where sip.accountcode='" . $_SESSION['login_usernames'] . "' " . $expired_sql . "" . $expiring_sql . " ");
 }
 if (mysqli_num_rows($sel) > 0) {
 	$records = mysqli_fetch_assoc($sel);
@@ -53,10 +67,10 @@ if (mysqli_num_rows($sel) > 0) {
 
 ## Total number of records with filtering
 if ($_SESSION['userroleforpage'] == 1) {
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientId LEFT JOIN users_login ON sip.user_id = users_login.id WHERE 1 " . $searchQuery);
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientId LEFT JOIN users_login ON sip.user_id = users_login.id WHERE 1 and id_cc_card !=0" . $searchQuery);
 } else {
 	//$sel = mysqli_query($con,"select count(*) as allcount from cc_sip_buddies sip WHERE sip.accountcode =".$_SESSION['login_usernames']." ".$searchQuery);	
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientId LEFT JOIN users_login ON sip.user_id = users_login.id where sip.accountcode='" . $_SESSION['login_usernames'] . "' " . $searchQuery);
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_sip_buddies sip LEFT JOIN Client clnt ON sip.clientId = clnt.clientId LEFT JOIN users_login ON sip.user_id = users_login.id where sip.accountcode='" . $_SESSION['login_usernames'] . "' " . $expired_sql . " " . $expiring_sql . " " . $searchQuery);
 }
 
 if (mysqli_num_rows($sel) > 0) {
@@ -73,7 +87,7 @@ if ($_SESSION['userroleforpage'] == 1) {
 } else {
 
 	$empQuery = "SELECT sip.id as id,users_login.role,sip.play_ivr,users_login.plan_id,users_login.email, sip.agent_name AS agent_name, sip.name AS name, sip.secret AS secret, sip.lead_operator as lead_operator, clnt.clientName AS clientName, sip.host AS host, sip.ext_status,sip.expirationdate FROM `cc_sip_buddies` sip
- 	LEFT JOIN Client clnt ON sip.clientId = clnt.clientID LEFT JOIN users_login ON sip.user_id = users_login.id WHERE accountcode=" . $_SESSION['login_usernames'] . " " . $searchQuery . " order by sip.name " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
+ 	LEFT JOIN Client clnt ON sip.clientId = clnt.clientID LEFT JOIN users_login ON sip.user_id = users_login.id WHERE accountcode=" . $_SESSION['login_usernames'] . " " . $expired_sql . " " . $expiring_sql . " " . $searchQuery . " order by sip.name " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
 }
 
 // echo $empQuery;exit;
@@ -94,17 +108,18 @@ while ($row = mysqli_fetch_assoc($empRecords)) {
 	$resultings = $array_result;
 	$queue_id = implode(",", $resultings);
 	$action = '';
-	if ($row['ext_status'] == '0' && $row['host'] == 'static' && ($_SESSION['userroleforpage'] == 2 || ($_SESSION['userroleforpage'] == 1 && in_array($row['role'], array(2, 3, 4))))) {
+	if ($row['ext_status'] == '0' && $row['host'] == 'static' && ($_SESSION['userroleforpage'] == 1)) {
 
 		$action = '<a href="extedit.php?id=' . $row['id'] . '&ext=payment">
 		<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
 		<i class="fa fa-repeat"></i>
 		</button></a>';
-	}
-	/* elseif(in_array($row['role'], array(3,4))){
-					$action = '<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
-					<i class="fa fa-ban"></i>
-					</button>';} */ else {
+	} elseif ($row['ext_status'] == '0' && $row['host'] == 'static' && $_SESSION['userroleforpage'] == 2) {
+		$action = '<a href="create_ext_invoice.php?ext=' . base64_encode($row['id']) . '&ren=1">
+		<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
+		<i class="fa fa-repeat"></i>
+		</button></a>';
+	} else {
 		$action = '<a href="extedit.php?id=' . $row['id'] . '">
 		<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
 		<i class="fa fa-pencil-square-o"></i>

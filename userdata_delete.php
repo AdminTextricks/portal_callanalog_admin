@@ -19,10 +19,10 @@ if(isset($_GET['id']))
 
     //  echo '<pre>';print_r($row);exit;
 
-     $sql = "Update users_login set status = 'Inactive', deleted = '1' where id='".$_GET['id']."'";//exit;
+     $sql = "DELETE FROM `users_login` WHERE id='".$_GET['id']."'";
      $result_deletequeue = mysqli_query($connection , $sql);
 
-     $query = "UPDATE `cc_card` SET `status` = '0' WHERE `id` = '".$_GET['id']."'";
+     $query = "DELETE FROM  `cc_card`  WHERE `id` = '".$_GET['id']."'";
      $result_cc = mysqli_query($connection, $query) or die("query failed");
 
      if ($result_deletequeue && $result_cc) {

@@ -4,7 +4,7 @@
 //$result_buddies = mysqli_query($connection , $query_sip_buddies);
 //echo '<pre>'; print_r($_SESSION);exit;
 $message = '';
-$query_client = "SELECT Client.clientName,Client.clientEmail,Client.clientId FROM `Client` LEFT JOIN `users_login` ON Client.clientId = users_login.clientId WHERE users_login.role !=3 and users_login.role !=4 and users_login.status = 'Active' and users_login.deleted = '0'";
+$query_client = "SELECT Client.clientName,Client.clientEmail,Client.clientId FROM `Client` LEFT JOIN `users_login` ON Client.clientId = users_login.clientId WHERE users_login.role !=4 and users_login.status = 'Active' and users_login.deleted = '0'";
 $result_client = mysqli_query($connection , $query_client);
 
 if(isset($_POST['selectedUser'])) { 

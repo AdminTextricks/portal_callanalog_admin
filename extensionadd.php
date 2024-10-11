@@ -7,10 +7,9 @@ $query_client = "SELECT Client.clientName,Client.clientEmail, Client.clientId FR
 $result_client = mysqli_query($connection, $query_client);
 
 if (isset($_POST['selectedUser'])) {
-	$query_user = "select * from users_login where clientId='" . $_POST['clientId'] . "'";
-	// $result_user_login = mysqli_query($connection , $query_user);
+	$query_user = "select * from users_login where clientId='" . $_POST['clientId'] . "' AND parent = '0'";
 	$result_user_details = mysqli_query($connection, $query_user);
-	$userDetails = mysqli_fetch_assoc($result_user_details);
+	$userDetails = mysqli_fetch_assoc($result_user_details); 
 } else {
 	$_POST['clientId'] = '';
 }
@@ -37,18 +36,18 @@ if (isset($_POST['submit'])) {
 	if ($_SESSION['userroleforpage'] == 1) {
 		if ($_POST['payment'] == 1) {
 
-			if($userDetails['role']==3){
-				$userId = $_POST['selectedUser'];
-			}else{
+			if ($userDetails['role'] == 3) {
+				$userId = $userDetails['id'];
+			} else {
 				$userId = '0';
 			}
 			$payment_status = "Paid";
-			$priceQuery = "select * from cc_did_exten_price WHERE type='extension' and user_id = '".$userId."'";
+			$priceQuery = "select * from cc_did_exten_price WHERE type='extension' and user_id = '" . $userId . "'";
 			$priceRecords = mysqli_query($con, $priceQuery);
 			$price_row = mysqli_fetch_assoc($priceRecords);
 			$ext_price = $price_row['price'] * (count($extension_name_arr));
 
-			$select_cust_credit = "select credit from cc_card where id='" . $_POST['selectedUser'] . "'";
+			$select_cust_credit = "select credit from cc_card where id='" . $userDetails['id'] . "'";
 			$result_cust = mysqli_query($connection, $select_cust_credit);
 
 			$rowcredit = mysqli_fetch_assoc($result_cust);
@@ -60,7 +59,7 @@ if (isset($_POST['submit'])) {
 				$error = "true";
 			} else {
 				$updated_credit = $current_credit - $ext_price;
-				$update_credit = "update cc_card set credit='" . $updated_credit . "' where id='" . $_POST['selectedUser'] . "'";
+				$update_credit = "update cc_card set credit='" . $updated_credit . "' where id='" . $userDetails['id'] . "'";
 				$resultupdate = mysqli_query($connection, $update_credit);
 				$error = "false";
 			}
@@ -83,7 +82,7 @@ if (isset($_POST['submit'])) {
 			$carduser = $rowcard['username'];
 
 			/* $select_agentinfo = "insert into AgentInfo (ext,instantCallMail,name,queue,status) VALUES ('".$_POST['name']."','No','".$_POST['agent_name']."','0','1')";
-												$query_agentinfo = mysqli_query($con, $select_agentinfo); */
+														 $query_agentinfo = mysqli_query($con, $select_agentinfo); */
 
 			if ($_SESSION['login_user_plan_id'] == '1' || $_SESSION['userroleforpage'] == '1') {
 				$dynamic = 'dynamic';
@@ -94,7 +93,7 @@ if (isset($_POST['submit'])) {
 			}
 			$created_at = date('Y-m-d H:i:s');
 			$startingdate = date('Y-m-d H:i:s');
-			$expirationdate = date('Y-m-d H:i:s', strtotime('+30 days'));
+			$expirationdate = date('Y-m-d H:i:s', strtotime('+29 days'));
 
 			// print_r($extension_name_arr); exit;
 			$exg_id = $extension_name_arr[0];
@@ -132,28 +131,30 @@ if (isset($_POST['submit'])) {
 			}
 
 			/* $srcFile = '/var/www/html/callanalog/admin/webrtc_template.conf';
-													$dstFile = '/var/www/html/webrtc_template.conf';
-													// Establish an SSH2 connection to the remote server.
-													$conn = ssh2_connect(RHOST, RPORT);
-													if (!$conn) {
-														die("Unable to connect to the remote server.");
-													}
-													// Authenticate with the private key.
-													if (ssh2_auth_pubkey_file($conn, RUSERNAME, PUBLIC_KEY, PRIVATE_KEY)) {
-														// Securely transfer the file to the remote server.
-														if (ssh2_scp_send($conn, $srcFile, $dstFile, 0644)) {
-															echo "File transferred successfully.";
-														} else {
-															echo "Failed to transfer the file.";
-														}
-													} else {
-														echo "Authentication failed.";
-													}
-													ssh2_disconnect($conn); */
+															 $dstFile = '/var/www/html/webrtc_template.conf';
+															 // Establish an SSH2 connection to the remote server.
+															 $conn = ssh2_connect(RHOST, RPORT);
+															 if (!$conn) {
+																 die("Unable to connect to the remote server.");
+															 }
+															 // Authenticate with the private key.
+															 if (ssh2_auth_pubkey_file($conn, RUSERNAME, PUBLIC_KEY, PRIVATE_KEY)) {
+																 // Securely transfer the file to the remote server.
+																 if (ssh2_scp_send($conn, $srcFile, $dstFile, 0644)) {
+																	 echo "File transferred successfully.";
+																 } else {
+																	 echo "Failed to transfer the file.";
+																 }
+															 } else {
+																 echo "Authentication failed.";
+															 }
+															 ssh2_disconnect($conn); */
+			if (SERVER_FLAG == 1) {
+				$result = shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
 
-			$result = shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
+				sip_reload();
+			}
 
-			sip_reload();
 			//$reeee = '1';//;
 			//$last_id = mysqli_insert_id($con);
 			//echo $_SESSION['login_user_plan_id'].'';
@@ -207,12 +208,12 @@ if (isset($_POST['submit'])) {
 				$gateway_id = mysqli_insert_id($con);
 
 				if ($_SESSION['userroleforpage'] == '1') {
-					$activity_type = 'Extension Assign to User';
-				} else {
-					$activity_type = 'Extension Purchase By User';
-				}
-
-				$msg = 'Extension No: ' . $_POST['extension_name'] . ' ' . 'Extension Purchase Succesfully!' . ' ' . $payment_type;
+                    		$activity_type = 'Extension Assign to User';
+                    		$msg = $_POST['extension_number'] . ' ' . 'Extension Assign Succesfully!' . ' ' . $payment_type;
+                		} else {
+                    		$activity_type = 'Extension Purchase By User';
+                    		$msg = $_POST['extension_number'] . ' ' . 'Extension Purchase Succesfully!' . ' ' . $payment_type;
+                		}
 				user_activity_log($_SESSION['login_user_id'], $_SESSION['userroleforclientid'], $activity_type, $msg);
 				$_SESSION['msg'] = 'Extension Added Succesfully!';
 				make_pdf($invo_id, $user_id);
@@ -471,7 +472,7 @@ if (isset($_POST['submit'])) {
 										</div>
 										<div class="col-12 col-md-8">
 											<input id="agentEmail" name="agentEmail" placeholder="voicemail"
-												class="form-control" type="email" value=""  />
+												class="form-control" type="email" value="" />
 										</div>
 									</div>
 								</div>
@@ -907,7 +908,7 @@ if (isset($_POST['submit'])) {
 											</div>
 											<div class="col-12 col-md-9">
 												<select id="nat" name="nat" class="form-control">
-													<option value="force_rport,comedia" >force_rport,comedia</option>
+													<option value="force_rport,comedia">force_rport,comedia</option>
 													<option value="no">no</option>
 													<option value="never">never</option>
 												</select>

@@ -101,6 +101,7 @@ if (isset($_POST['jsondataUpdated'])) {
         }
     }
     $res = array();
+    if(SERVER_FLAG==1){
     $result = shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
     $result1 = shell_exec('sudo /var/www/html/callanalog/admin/transfer_2.sh');
     if ($result) {
@@ -111,6 +112,7 @@ if (isset($_POST['jsondataUpdated'])) {
         $res = array('status' => 'Error', 'message' => 'File Transfer Failed.');
     }
     sip_reload();
+}
 
     echo json_encode($res);
 }

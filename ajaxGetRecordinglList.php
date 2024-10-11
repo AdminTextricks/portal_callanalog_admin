@@ -15,6 +15,7 @@ $searchQuery = " ";
 if($searchValue != ''){
 	$searchQuery = " and (cvm.name like '%".$searchValue."%' or 
 	cvm.music_text like '%".$searchValue."%' or 
+	Client.clientName like'%".$searchValue."%' or
          cvm.upload_music like '%".$searchValue."%' )";
 }
 
@@ -60,9 +61,9 @@ if(mysqli_num_rows($sel) > 0 ){
 
 ## Total number of records with filtering
 if($_SESSION['userroleforpage'] == 1){
-	$sel2 = "select count(*) as allcount from music cvm WHERE 1 ".$mailboxnamesidss." ".$searchQuery;
+	$sel2 = "select count(*) as allcount from music cvm left join users_login ON cvm.user_id=users_login.id left join Client ON cvm.clientid=Client.clientId WHERE 1 ".$mailboxnamesidss." ".$searchQuery;
 }else{
-	$sel2 = "select count(*) as allcount from music cvm WHERE ".$mailboxnamesidss." ".$searchQuery;
+	$sel2 = "select count(*) as allcount from music cvm left join users_login ON cvm.user_id=users_login.id left join Client ON cvm.clientid=Client.clientId  WHERE ".$mailboxnamesidss." ".$searchQuery;
 }
 $sel2 = mysqli_query($con,$sel2);
 if(mysqli_num_rows($sel2) > 0 ){

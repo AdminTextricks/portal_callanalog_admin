@@ -2,7 +2,7 @@
 
 # Define server details
 SERVER_IP="85.195.76.161"
-SSH_PORT="17342"
+SSH_PORT="18634"
 SSH_KEY="/var/www/.ssh/85.195.76.161_opnsipusr_privatekey.pem"
 SSH_USER="opnsipusr"
 

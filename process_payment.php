@@ -16,9 +16,10 @@ $item_type = $_POST['item_type'];
 $user_id = $_POST['user_id'];
 $amount_cents = $_POST['stripeAmount'];
 $btn_type = $_POST['btn_type'];
+$renew_item = $_POST['renew_item'];
 
-if ($btn_type == 'Pay with BTC') {
-    $pay_currency = 'BTC';
+if ($btn_type == 'Pay with USDTTRC-20') {
+    $pay_currency = 'usdttrc20';
     $apiKey = 'BE5A9TP-666MRMH-NKSJZH0-E8XTN4B';
 } elseif ($btn_type == 'Pay with USD') {
     $pay_currency = 'USD';
@@ -130,7 +131,7 @@ if ($amount_cents > 0 && $invoice_details['invoice_amount'] == $amount_cents) {
                     // Generate payment link
                     $paymentLink = 'payment_confirmation.php?pay_address=' . $responseData['pay_address'] . '&payment_id=' . $responseData['payment_id'] . '&price_amount=' . $responseData['price_amount'] . '&pay_currency=' . $responseData['pay_currency'] . '&order_id=' . $responseData['order_id'] . '&pay_amount=' . $responseData['pay_amount'] . '&amount_received=' . $responseData['amount_received'] . '&invoice_id=' . $invoice_id . '&gateway_invo_id=' . $gateway_invo_id;
 
-                    $userDetails = '&user_id=' . $user_id . '&email=' . $email . '&username=' . $user_name . '&item_name=' . $item_name . '&item_number=' . $item_number . '&payment_type=' . $payment_type . '&item_type=' . $item_type . '&accountcode=' . $accountcode;
+                    $userDetails = '&user_id=' . $user_id . '&email=' . $email . '&username=' . $user_name . '&item_name=' . $item_name . '&item_number=' . $item_number . '&payment_type=' . $payment_type . '&item_type=' . $item_type . '&accountcode=' . $accountcode . '&renew_item=' . $renew_item;
 
 
                     // Print the payment link

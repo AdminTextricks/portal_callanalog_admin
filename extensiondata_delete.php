@@ -37,9 +37,11 @@ if (isset($_GET['id'])) {
             }
         }
         file_put_contents($sip_additional_path, $output, LOCK_EX);
+        if(SERVER_FLAG==1){
         shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
         shell_exec('sudo /var/www/html/callanalog/admin/transfer_2.sh');
-
+        sip_reload();
+        }
         $activity_type = 'Extension Deleted';
         if ($_SESSION['userroleforpage'] == '1') {
             $message = 'Extension No: ' . $extname . 'Extension Deleted Succesfully! By Admin';
@@ -90,8 +92,12 @@ if (isset($_GET['id'])) {
         }
         file_put_contents($sip_additional_path, $output, LOCK_EX);
     }
+if(SERVER_FLAG==1){
     shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
     shell_exec('sudo /var/www/html/callanalog/admin/transfer_2.sh');
+    sip_reload();
+}
+
     $sql = "DELETE FROM cc_sip_buddies where id in ($id)";
     //$sql = "DELETE FROM crud WHERE id in ($id)";
     if (mysqli_query($connection, $sql)) {

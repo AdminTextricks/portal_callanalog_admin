@@ -1,9 +1,9 @@
-<?php require_once('header.php');
+<?php require_once ('header.php');
 // include('phpqrcode/qrlib.php');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include('phpqrcode/qrlib.php');
+include ('phpqrcode/qrlib.php');
 
 $pay_address = $_GET['pay_address'];
 $payment_id = $_GET['payment_id'];
@@ -22,6 +22,7 @@ $item_number = $_GET['item_number'];
 $payment_type = $_GET['payment_type'];
 $item_type = $_GET['item_type'];
 $accountcode = $_GET['accountcode'];
+$renew_item = $_GET['renew_item'];
 
 // Debugging output
 var_dump($pay_address, $price_amount, $pay_currency, $order_id, $payment_id, $pay_amount, $amount_received);
@@ -37,7 +38,7 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
     .common {
         font-weight: bold;
         text-align: center;
-        margin-left: 50%;
+        /* margin-left: 50%; */
     }
 
     .order {
@@ -61,13 +62,24 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
             </div>
             <div class="big_live_outer">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-md-2"></div>
+                    <div class="col-sm-8">
                         <div class="queue_info">
                             <h2 class="common" style="margin-bottom: 30px;">NOW Payment</h2>
+                            <div class="table-data__tool-right">
+                                <center> <label class="dot--red au-btn--small" style="border-radius: 20px;">
+                                        <i style="font-size:20px;" class="icon fa fa-warning fa-spin icon-red"
+                                            aria-hidden="true"></i><br>
+                                        1. Please do not navigate away from or leave the page while making a payment.
+                                        <br>
+                                        2. Please pay the correct amount. If you pay an incorrect amount, the entire
+                                        transaction will be canceled, and we are not responsible for that.</label>
+                                </center>
+                            </div>
                             <div>
                                 <h4 class="common">Total Amount Pay:</h4>
                                 <p class="common order">
-                                    <?php echo $pay_amount . " BTC"; ?> <br>
+                                    <?php echo $pay_amount . " UDST"; ?> <br>
                                 </p>
                             </div>
                             <div>
@@ -83,11 +95,11 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
                             <div>
                                 <p class="common order">
                                     <?php
-                                    echo 'Scan QR Code';
+                                    echo 'Scan QR Code <br>';
                                     //echo '<hr />';
                                     // echo 'Server PNG File: ' . $pngAbsoluteFilePath;
                                     // echo '<hr />';
-                                    echo '<img src="' . $urlRelativeFilePath . '" class="common" style=" width: 55%;height: 40%;margin-left: 3%;"/>';
+                                    echo '<img src="' . $urlRelativeFilePath . '" class="common" style=" width: 30%;height: 40%;margin-left: 3%;"/>';
                                     ?>
                                 </p>
                             </div>
@@ -95,17 +107,19 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
                                 <p class="common order">
                                     <button class="btn btn-primary">
                                         <span id="payment_status"></span>
-                                    </button><br> <span>Please Do Not Back...<br>Until Payment Status Finished</span>
+                                    </button><br> <span>Please Do Not Back For 5 to 10 minutes...<br>Until Payment
+                                        Status Finished</span>
                                 </p>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4"></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php require_once('footer.php'); ?>
+<?php require_once ('footer.php'); ?>
 <script>
     var payment_id = <?php echo $payment_id; ?>;
     var invoice_id = <?php echo $invoice_id; ?>;
@@ -118,17 +132,22 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
     var payment_type = '<?php echo $payment_type; ?>';
     var item_type = '<?php echo $item_type; ?>';
     var accountcode = '<?php echo $accountcode; ?>';
+    var renew_item = '<?php echo $renew_item; ?>';
 
-    setInterval(get_status, 300000);
+    setInterval(get_status, 10000);
     function get_status() {
         $.ajax({
             url: 'ajaxpayment_confirmation.php',
             type: 'post',
-            data: { payment_id: payment_id, invoice_id: invoice_id, user_id: user_id, gateway_invo_id: gateway_invo_id, email: email, username: username, item_name: item_name, item_number: item_number, payment_type: payment_type, item_type: item_type, accountcode: accountcode },
+            data: { payment_id: payment_id, invoice_id: invoice_id, user_id: user_id, gateway_invo_id: gateway_invo_id, email: email, username: username, item_name: item_name, item_number: item_number, payment_type: payment_type, item_type: item_type, accountcode: accountcode, renew_item: renew_item },
             success: function (data) {
                 var a = data.replace(/^\s+|\s+$/gm, '');
                 if (a == "finished" || a == "partially_paid") {
                     window.location.href = "payment_successfull.php";
+                } else if (a == "failed") {
+                    setTimeout(() => {
+                        window.location.href = "payment_error.php";
+                    }, 3000);
                 } else {
                     $("#payment_status").text(data);
                 }

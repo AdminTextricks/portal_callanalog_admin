@@ -111,13 +111,14 @@
                                             <input name="item_type" id="item_type" class="form-control input-field-pay"
                                                 type="text" value="<?php echo $item_type; ?>">
                                         </div>
+                                        <input type="hidden" name="renew_item" value="<?php echo $_GET['renew']; ?>" />
                                         <!--<div class="form-group" style="display:none;">
                         <input name="gatway_order_id" id="gatway_order_id" class="form-control input-field-pay" type="text" value="<?php echo $invoice['order_id']; ?>"  required />
                         </div>  -->
                                         <div class="form-group text-right">
                                             <button class="btn btn-secondary " type="reset">Reset</button>
                                             <input type="submit" name="btn_type" class="btn btn-primary btn_type"
-                                                value="Pay with BTC" />
+                                                value="Pay with USDTTRC-20" />
                                             <!-- <input type="submit" name="btn_type" class="btn btn-primary" value="Pay with USD" /> -->
                                             <!--  <input type="submit" name="btn_type" class="btn btn-primary"
                                                 value="Pay with Ethereum (ETH)" /> -->
@@ -139,7 +140,7 @@
                 <div class="col-md-3"></div>
             </div>
             <script>
-                $(document).ready(function async () {
+                $(document).ready(function async() {
                     $("#paymentFrm").submit(function (event) {
                         event.preventDefault();
                         document.getElementsByClassName("loader")[0].style.display = "block";

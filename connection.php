@@ -1,96 +1,95 @@
-<?php 
-
-// session_name('CallAnalog');
+<?php
 session_start();
 
-// error_reporting(E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
-// error_reporting(E_NOTICE);
-$connection = mysqli_connect("localhost", "root", "tumko34h1se","myphonesystem");
+error_reporting(0);
+ini_set('display_errors', 0);
+define('SERVER_FLAG', 1);
+if (SERVER_FLAG == 0) {
+    // SERVER_FLAG = 0 for Local
+    $connection = mysqli_connect("localhost", "root", "", "myphone_r");
 
-$con = mysqli_connect("localhost", "root", "tumko34h1se","myphonesystem");
+    $con = mysqli_connect("localhost", "root", "", "myphone_r");
 
-$extension_numbers = array('1','2','3','4','5','10','15','20','50');
+    define('SECRET_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r');
 
-$numberpool = array('800','833','844','855','866','877','888');
+    define('PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74');
 
-$user_type_arr = array(1=>'Admin', 2=>'User', 3=>'Reseller', 4=>'Reseller_User');
+    define('STRIPE_API_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r');
+    define('STRIPE_PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74');
+}
 
-define('PUBLIC_KEY','/var/www/.ssh/id_rsa.pub');
+if (SERVER_FLAG == 2) {
 
-define('PRIVATE_KEY','/var/www/.ssh/id_rsa');
+    // SERVER_FLAG = 2 for Staging
+    $connection = mysqli_connect("localhost", "root", "tumko34h1se", "myphonesystem");
 
-define('RHOST','37.61.219.110');
+    $con = mysqli_connect("localhost", "root", "tumko34h1se", "myphonesystem");
 
-define('RPORT','19645');
+    define('SECRET_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r');
 
-//define('SECOND_PUBLIC_KEY','/var/www/.ssh/id_rsa2.pub');
-//define('SECOND_PRIVATE_KEY','/var/www/.ssh/id_rsa2');
-//define('SECOND_RHOST','85.195.76.161');
-//define('SECOND_RPORT','17342');
-//define('SECOND_RUSERNAME','opnsipusr');
+    define('PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74');
 
-define('SECOND_PUBLIC_KEY','/var/www/.ssh/id_rsa.pub');
-define('SECOND_PRIVATE_KEY','/var/www/.ssh/id_rsa');
-define('SECOND_RHOST','37.61.219.110');
-define('SECOND_RPORT','19645');
-define('SECOND_RUSERNAME','asteruser');
+    define('STRIPE_API_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r');
+    define('STRIPE_PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74');
+}
 
+if (SERVER_FLAG == 1) {
 
-define('RUSERNAME','asteruser');
+    // SERVER_FLAG = 1 for Live
+    $connection = mysqli_connect("localhost", "root", "tumko34h1se", "myphonesystem");
 
-// define('RPASSWORD','NDJNMpg8553T');
+    $con = mysqli_connect("localhost", "root", "tumko34h1se", "myphonesystem");
 
-define('RPASSWORD','{Tfmx;O5Ar2;hp;%-vj]%3--$nBb6S');
+    define('STRIPE_API_KEY', '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');
+    define('STRIPE_PUBLISHABLE_KEY', 'pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH');
 
-// define('HOST','bom1plzcpnl494593.prod.bom1.secureserver.net');
-define('HOST','smtp.gmail.com');
+    define('SECRET_KEY', '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');
+    define('PUBLISHABLE_KEY', 'pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH');
+}
 
-define('RECORDINGS','https://portal-myphonesystems-recordings.s3.ap-south-1.amazonaws.com/');
+$extension_numbers = array('1', '2', '3', '4', '5', '10', '15', '20', '50');
 
-define('PORT',587);
+$numberpool = array('800', '833', '844', '855', '866', '877', '888');
 
-// define('IPDOMAIN','37.61.219.110:50070');
+$user_type_arr = array(1 => 'Admin', 2 => 'User', 3 => 'Reseller', 4 => 'Reseller_User');
 
-define('IPDOMAIN','sip.callanalog.com:50070');
+define('PUBLIC_KEY', '/var/www/.ssh/id_rsa.pub');
 
+define('PRIVATE_KEY', '/var/www/.ssh/id_rsa');
 
-// define('EMAIL','info@myphonesystems.com');
-// define('EMAIL','ankit@textricks.com');
-define('EMAIL','info@callanalog.com');
+define('RHOST', '37.61.219.110');
 
-// define('PASSWORD','myphonesystems@123');
-define('PASSWORD','amkomuqebcfvuebp');
+define('RPORT', '19645');
 
-define('MYPHONE','Call Analog');
+define('SECOND_PUBLIC_KEY', '/var/www/.ssh/id_rsa.pub');
+define('SECOND_PRIVATE_KEY', '/var/www/.ssh/id_rsa');
+define('SECOND_RHOST', '37.61.219.110');
+define('SECOND_RPORT', '19645');
+define('SECOND_RUSERNAME', 'asteruser');
 
-define('ACCOUNTSID','ACede26b49f6397ebfa1ce13d4f2ee334c');
+define('RUSERNAME', 'asteruser');
 
-define('AUTHTOKEN','4c3f97db3fcbf0e9ee1b714152082e85');
+define('RPASSWORD', '{Tfmx;O5Ar2;hp;%-vj]%3--$nBb6S');
 
-define('TWILLONUMBER','+18885468422');
+define('HOST', 'smtp.gmail.com');
 
-// define('SECRET_KEY','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');
+define('RECORDINGS', 'https://portal-myphonesystems-recordings.s3.ap-south-1.amazonaws.com/');
 
-// define('PUBLISHABLE_KEY','pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH');
+define('PORT', 587);
 
+define('IPDOMAIN', 'sip.callanalog.com:50070');
 
-// define('SECRET_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r');
-// define('PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74');
+define('EMAIL', 'info@callanalog.com');
 
-//define('SECRET_KEY', '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');
-//define('PUBLISHABLE_KEY', 'pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH');
+define('PASSWORD', 'amkomuqebcfvuebp');
 
- define('SECRET_KEY', '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');
- define('PUBLISHABLE_KEY', 'pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH');
+define('CALLANALOG', 'Call Analog');
 
- //define('STRIPE_API_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r'); 
- //define('STRIPE_PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74'); 
- 
- define('STRIPE_API_KEY', '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'); 
- define('STRIPE_PUBLISHABLE_KEY', 'pk_live_51JHZjxG71L2aH3X1DB6IwwPkiYZ3Bq0WN2I1RXjggZ3LDr8Sa5MJMOatI0Ha8jaUvcWUD1rCOCMlpVKrggPVQRFw00xi47rZgH'); 
- 
-//  define('STRIPE_API_KEY', 'sk_test_51JHZjxG71L2aH3X1s51mMhtoNHR4OLjmz3aIon30blNltbjw2Pu7DOmh4FbBi2502vGlYgEfNB8x1xaxKnLEnLW2000ZTC5Z3r'); 
-// define('STRIPE_PUBLISHABLE_KEY', 'pk_test_51JHZjxG71L2aH3X16DtsCw8NhYxYGQv9IK41nlvjqmtlM3yoha3LqgQcjHvC81fqdknutLgFPf4EJj2UXPMIVRPP00fPbxse74'); 
+define('ACCOUNTSID', 'ACede26b49f6397ebfa1ce13d4f2ee334c');
+
+define('AUTHTOKEN', '4c3f97db3fcbf0e9ee1b714152082e85');
+
+define('TWILLONUMBER', '+18885468422');
 
 define('SIP_TEMPLATE_CONTENT', 'type=friend
 host=dynamic
@@ -111,7 +110,8 @@ nat=force_rport,comedia');
 
 
 $did_provider = array(
-    'IDT','ALZ'
+    'IDT',
+    'ALZ'
 );
 
 $timezones = array(

@@ -1,6 +1,6 @@
 <?php 
 require_once('header.php'); 
-$query_client = "SELECT Client.clientName,Client.clientId,Client.clientEmail FROM `Client` LEFT JOIN `users_login` ON Client.clientId = users_login.clientId WHERE users_login.role !=3 and users_login.role !=4 and users_login.status = 'Active' and users_login.deleted = '0'";
+$query_client = "SELECT Client.clientName,Client.clientEmail, Client.clientId FROM `Client` LEFT JOIN `users_login` ON Client.clientId = users_login.clientId WHERE users_login.role !=4 and users_login.status = 'Active' and users_login.deleted = '0'";
 $result_client = mysqli_query($connection , $query_client);
 if(isset($_POST['selectedUser'])) { 
 	$query_user = "select * from users_login where clientId='".$_POST['clientId']."'";

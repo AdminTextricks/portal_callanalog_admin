@@ -97,7 +97,7 @@
    	$recipientNumber = $phone; // Replace with the recipient's phone number
    	// echo"<pre>";print_r($recipientNumber);die;
    	// Message content
-   	$message = 'Your Mobile Number otp verification code for myphonesystems is '.$mobile_otp;
+   	$message = 'Your Mobile Number otp verification code for Call Analog is '.$mobile_otp;
    
    	// Initialize the Twilio client
    	$client = new Client($accountSid, $authToken);

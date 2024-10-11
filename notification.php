@@ -152,12 +152,12 @@ if ($_SESSION['userroleforpage'] == 1) {
                                             } ?> value="<?php echo 'Update' ?>">
                                                 <?php echo 'Update'; ?>
                                             </option>
-                                            <option <?php if (isset($_POST['notification_type']) && $_POST['notification_type'] == 'Deleted') {
+                                            <option <?php if (isset($_POST['notification_type']) && $_POST['notification_type'] == 'Delete') {
                                                 echo 'selected="selected"';
                                             } else {
                                                 echo '';
-                                            } ?> value="<?php echo 'Deleted' ?>">
-                                                <?php echo 'Deleted'; ?>
+                                            } ?> value="<?php echo 'Delete' ?>">
+                                                <?php echo 'Delete'; ?>
                                             </option>
                                             <!-- <option <?php if (isset($_POST['notification_type']) && $_POST['notification_type'] == 'Conference') {
                                                 echo 'selected="selected"';

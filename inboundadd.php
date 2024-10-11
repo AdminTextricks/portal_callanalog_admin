@@ -11,7 +11,7 @@ while ($row_desti = mysqli_fetch_array($res_destination)) {
 
 $message = '';
 if (isset($_POST['selectedUser'])) {
-	$query_user = "select * from users_login where clientId='" . $_POST['clientId'] . "'";
+	$query_user = "select * from users_login where clientId='" . $_POST['clientId'] . "' AND parent = '0'";
 	$result_user = mysqli_query($connection, $query_user);
 	$userDetails = mysqli_fetch_assoc($result_user);
 
@@ -36,7 +36,6 @@ if (isset($_POST['submit'])) {
 	$stopday = $_POST['stopday'];
 	$all_time = $_POST['all_time'];
 	$ply_back = $_POST['playback'];
-
 	$clientId = $_POST['clientId'];
 	$selectedUser = $_POST['selectedUser'];
 	$did_or_tfn = $_POST['did_or_tfn'];
@@ -53,138 +52,145 @@ if (isset($_POST['submit'])) {
 	$payment = $_POST['payment'];
 	$error = 'false';
 
-	$did_query = "SELECT `did` FROM `cc_did` WHERE `id` ='" . $did_or_tfn . "'";
+	$did_query = "SELECT `did`,reserved FROM `cc_did` WHERE `id` ='" . $did_or_tfn . "'";
 
 	$did_result = mysqli_query($connection, $did_query);
 	if (mysqli_num_rows($did_result) > 0) {
 		$did_row = mysqli_fetch_assoc($did_result);
 		$did_num = $did_row['did'];
+		$reserved = $did_row['reserved'];
 	}
-
-	$dest_types = $destination_type_arr[$destination_type];
-	$didids = $did_or_tfn;
-	$user_plan_id = $userDetails['plan_id'];
-	$startingdate = date('Y-m-d H:i:s');
-	$expirationdate = date('Y-m-d H:i:s', strtotime('+1 month'));
-
-
-	if ($payment == '0') {
-		$price = 0;
-		$payment_status = 'Free';
-	} else {
-		if($userDetails['role']==3){
-			$userId = $_POST['selectedUser'];
-		}else{
-			$userId = '0';
-		}
-		$payment_status = "Paid";
-		$query_price = "select * from cc_did_exten_price WHERE type='did' and user_id = '".$userId."'";
-		$result_price = mysqli_query($connection, $query_price);
-		if (mysqli_num_rows($result_price) > 0) {
-			$rowPrice = mysqli_fetch_array($result_price);
-			$price = $rowPrice['price'];
-		}
-	}
-	$select_cust_credit = "select credit from cc_card where id='" . $_POST['selectedUser'] . "'";
-	$result_cust = mysqli_query($connection, $select_cust_credit);
-
-	$rowcredit = mysqli_fetch_assoc($result_cust);
-	$current_credit = $rowcredit['credit'];
-	// echo $current_credit;exit;
-
-	if ($price > $current_credit) {
-		$message = "Not Enough Credit";
+	if ($reserved == 1) {
 		$error = 'true';
-	} else {
-		$updated_credit = $current_credit - $price;
-		$update_credit = "update cc_card set credit='" . $updated_credit . "' where id='" . $_POST['selectedUser'] . "'";
-		$resultupdate = mysqli_query($connection, $update_credit);
-		$invoice_amount = $price;
-
+		$message = "This DID is reserved,Please Select Other DID";
 	}
 
-	if ($error == 'false') {
-		$quantity = 1;
-		$item_type = 'DID';
-		$update_did = "update cc_did set iduser = '" . $selectedUser . "', billingtype='" . $user_plan_id . "', activated ='1', startingdate ='" . $startingdate . "', expirationdate = '" . $expirationdate . "', status='Active', call_screening_action='" . $callScreenAction . "', call_destination='" . $destination . "', carieer='" . $carieer . "', didtype='" . $destination_type . "', clientId='" . $clientId . "', screen_status='" . $playWelcomeMessage . "', playback='" . $welcomeMessage . "' where id ='" . $didids . "'";
-		$result_didupdate = mysqli_query($connection, $update_did);
+	if ($error == "false") {
+		$dest_types = $destination_type_arr[$destination_type];
+		$didids = $did_or_tfn;
+		$user_plan_id = $userDetails['plan_id'];
+		$startingdate = date('Y-m-d H:i:s');
+		$expirationdate = date('Y-m-d H:i:s', strtotime('+1 month'));
 
-		if ($sch_call == 1) {
-			$insert_destination = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $destination . "', '" . $dest_types . "', '1', '" . $selectedUser . "', '" . $didids . "','1','1', '" . $sch_call . "', '" . $starttime . "','" . $stoptime . "', '" . $startday . "', '" . $stopday . "', '" . $all_time . "', '" . $ply_back . "')";
+
+		if ($payment == '0') {
+			$price = 0;
+			$payment_status = 'Free';
 		} else {
-			$insert_destination = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $destination . "', '" . $dest_types . "', '1', '" . $selectedUser . "', '" . $didids . "','1','1', '0', '0','0', '0', '0', '1', '0')";
-		}
-		$result_destination = mysqli_query($connection, $insert_destination);
-		if (!empty($forwardDestType) and !empty($forwardDest)) {
-
-			$dest_types = $destination_type_arr[$forwardDestType];
-
-			$insert_destination_pri2 = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $forwardDest . "', '" . $forwardDestType . "', '2', '" . $selectedUser . "', '" . $didids . "','1','1', '" . $sch_call . "', '" . $starttime . "','" . $stoptime . "', '" . $startday . "', '" . $stopday . "', '" . $all_time . "', '" . $ply_back . "')";
-			$result_destination_pri2 = mysqli_query($connection, $insert_destination_pri2);
-		}
-
-		if ($result_destination) {
-			/******** Create DID purchase history */
-
-			$insert_did_history = "INSERT INTO `did_buying_history` ( `user_id`, `clientId`, `did_id`, `purchase_date`, `expiry_date`) VALUES ( '" . $selectedUser . "', '" . $clientId . "', '" . $didids . "', '" . $startingdate . "','" . $expirationdate . "')";
-			$result_did_history = mysqli_query($connection, $insert_did_history);
-
-			/******** Create invoice when added by admin */
-			//echo '<pre>'; print_r($_POST); echo '</pre>';
-			$query_inv = "select max(id) as id from invoices";
-			$result_inv = mysqli_query($connection, $query_inv);
-			if (mysqli_num_rows($result_inv) > 0) {
-				$rowid = mysqli_fetch_array($result_inv);
-				$nn = $rowid['id'] + 1;
-				$invoice_id = "INV/" . date('Y') . "/000" . $nn;
+			if ($userDetails['role'] == 3) {
+				$userId = $userDetails['id'];
 			} else {
-				$invoice_id = 'INV/' . date("Y") . '/00001';
+				$userId = '0';
 			}
-
-			$user_id = $_POST['selectedUser'];
-			$user_plan_id = $userDetails['plan_id'];
-			$invoice_currency = 'USD';
-			$item_number = '';
-			$query_did = "select did from cc_did where id='" . $didids . "'";
-			$result_did = mysqli_query($connection, $query_did);
-			if (mysqli_num_rows($result_did) > 0) {
-				$rowDid = mysqli_fetch_array($result_did);
-				$item_number = $rowDid['did'];
+			$payment_status = "Paid";
+			$query_price = "select * from cc_did_exten_price WHERE type='did' and user_id = '" . $userId . "'";
+			$result_price = mysqli_query($connection, $query_price);
+			if (mysqli_num_rows($result_price) > 0) {
+				$rowPrice = mysqli_fetch_array($result_price);
+				$price = $rowPrice['price'];
 			}
+		}
+		$select_cust_credit = "select credit from cc_card where id='" . $userDetails['id'] . "'";
+		$result_cust = mysqli_query($connection, $select_cust_credit);
 
-			$insert_invoice = "insert into 	invoices (user_id, invoice_id, item_type, invoice_currency, invoice_amount, invoice_subtotal_amount,payment_status) VALUES ('" . $user_id . "','" . $invoice_id . "','" . $item_type . "','" . $invoice_currency . "','" . $invoice_amount . "','" . $invoice_amount . "','" . $payment_status . "')";
-			$query_res = mysqli_query($con, $insert_invoice);
-			$invoice_db_id = mysqli_insert_id($con);
+		$rowcredit = mysqli_fetch_assoc($result_cust);
+		$current_credit = $rowcredit['credit'];
+		// echo $current_credit;exit;
 
-			$item_price = $invoice_amount;
+		if ($price > $current_credit) {
+			$message = "Not Enough Credit";
+			$error = 'true';
+		} else {
+			$updated_credit = $current_credit - $price;
+			$update_credit = "update cc_card set credit='" . $updated_credit . "' where id='" . $userDetails['id'] . "'";
+			$resultupdate = mysqli_query($connection, $update_credit);
+			$invoice_amount = $price;
 
-			$insert_invoice_item = "insert into invoices_items (invoice_id, item_type, item_number, price) VALUES ('" . $invoice_db_id . "','" . $item_type . "','" . $item_number . "','" . $item_price . "')";
-			$query_res_invo = mysqli_query($con, $insert_invoice_item);
+		}
 
-			$gatway_order_id = $invoice_id . '-UID-' . $user_id;
-			if ($payment == '1') {
-				$payment_type = 'Wallet';
+		if ($error == 'false') {
+			$quantity = 1;
+			$item_type = 'DID';
+			$update_did = "update cc_did set iduser = '" . $selectedUser . "', billingtype='" . $user_plan_id . "', activated ='1', startingdate ='" . $startingdate . "', expirationdate = '" . $expirationdate . "', status='Active', call_screening_action='" . $callScreenAction . "', call_destination='" . $destination . "', carieer='" . $carieer . "', didtype='" . $destination_type . "', clientId='" . $clientId . "', screen_status='" . $playWelcomeMessage . "', playback='" . $welcomeMessage . "' where id ='" . $didids . "'";
+			//echo $update_did;exit;
+			$result_didupdate = mysqli_query($connection, $update_did);
+
+			if ($sch_call == 1) {
+				$insert_destination = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $destination . "', '" . $dest_types . "', '1', '" . $selectedUser . "', '" . $didids . "','1','1', '" . $sch_call . "', '" . $starttime . "','" . $stoptime . "', '" . $startday . "', '" . $stopday . "', '" . $all_time . "', '" . $ply_back . "')";
 			} else {
-				$payment_type = 'Free by Admin';
+				$insert_destination = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $destination . "', '" . $dest_types . "', '1', '" . $selectedUser . "', '" . $didids . "','1','1', '0', '0','0', '0', '0', '1', '0')";
 			}
-			$user_name = $userDetails['name'];
-			$email = $userDetails['email'];
-			$insert_invoice = "insert into gateways_payments (user_id, invoice_db_id, gatway_invoice_id, gatway_order_id, payment_type, item_type, name, email, item_name, item_number, paid_amount, paid_amount_currency, payment_status,created) VALUES ('" . $user_id . "','" . $invoice_db_id . "','" . $invoice_id . "', '" . $gatway_order_id . "','" . $payment_type . "','" . $item_type . "','" . $user_name . "','" . $email . "','Stripe Myphonesystems', '" . $item_number . "','" . $invoice_amount . "','" . $invoice_currency . "','success','" . date('Y-m-d H:i:s') . "')";
-			$query_res = mysqli_query($con, $insert_invoice);
-			$invo_id = mysqli_insert_id($con);
+			$result_destination = mysqli_query($connection, $insert_destination);
+			if (!empty($forwardDestType) and !empty($forwardDest)) {
 
-			/******   END   ******* */
+				$dest_types = $destination_type_arr[$forwardDestType];
 
-			$activity_type = 'DID Assign To user';
-			$msg = 'DID No: ' . $did_num . ' ' . 'DID Assign to user Succesfully!' . ' ' . $payment_status . ' ' . 'By Admin';
-			user_activity_log($_POST['selectedUser'], $_POST['clientId'], $activity_type, $msg);
+				$insert_destination_pri2 = "INSERT INTO `cc_did_destination` ( `destination`, `destination_name`, `priority`, `id_cc_card`, `id_cc_did`, `voip_call`, `validated`, `sch_call`, `starttime`, `stoptime`, `startday`, `stopday`, `all_time`, `playback`) VALUES ( '" . $forwardDest . "', '" . $forwardDestType . "', '2', '" . $selectedUser . "', '" . $didids . "','1','1', '" . $sch_call . "', '" . $starttime . "','" . $stoptime . "', '" . $startday . "', '" . $stopday . "', '" . $all_time . "', '" . $ply_back . "')";
+				$result_destination_pri2 = mysqli_query($connection, $insert_destination_pri2);
+			}
 
-			$_SESSION['msg'] = "Inbound Added Successfully";
-			make_pdf($invoice_db_id, $_POST['selectedUser']);
-			echo '<script>window.location.href="inbound.php"</script>';
+			if ($result_destination) {
+				/******** Create DID purchase history */
+
+				$insert_did_history = "INSERT INTO `did_buying_history` ( `user_id`, `clientId`, `did_id`, `purchase_date`, `expiry_date`) VALUES ( '" . $selectedUser . "', '" . $clientId . "', '" . $didids . "', '" . $startingdate . "','" . $expirationdate . "')";
+				$result_did_history = mysqli_query($connection, $insert_did_history);
+
+				/******** Create invoice when added by admin */
+				//echo '<pre>'; print_r($_POST); echo '</pre>';
+				$query_inv = "select max(id) as id from invoices";
+				$result_inv = mysqli_query($connection, $query_inv);
+				if (mysqli_num_rows($result_inv) > 0) {
+					$rowid = mysqli_fetch_array($result_inv);
+					$nn = $rowid['id'] + 1;
+					$invoice_id = "INV/" . date('Y') . "/000" . $nn;
+				} else {
+					$invoice_id = 'INV/' . date("Y") . '/00001';
+				}
+
+				$user_id = $_POST['selectedUser'];
+				$user_plan_id = $userDetails['plan_id'];
+				$invoice_currency = 'USD';
+				$item_number = '';
+				$query_did = "select did from cc_did where id='" . $didids . "'";
+				$result_did = mysqli_query($connection, $query_did);
+				if (mysqli_num_rows($result_did) > 0) {
+					$rowDid = mysqli_fetch_array($result_did);
+					$item_number = $rowDid['did'];
+				}
+
+				$insert_invoice = "insert into 	invoices (user_id, invoice_id, item_type, invoice_currency, invoice_amount, invoice_subtotal_amount,payment_status) VALUES ('" . $user_id . "','" . $invoice_id . "','" . $item_type . "','" . $invoice_currency . "','" . $invoice_amount . "','" . $invoice_amount . "','" . $payment_status . "')";
+				$query_res = mysqli_query($con, $insert_invoice);
+				$invoice_db_id = mysqli_insert_id($con);
+
+				$item_price = $invoice_amount;
+
+				$insert_invoice_item = "insert into invoices_items (invoice_id, item_type, item_number, price) VALUES ('" . $invoice_db_id . "','" . $item_type . "','" . $item_number . "','" . $item_price . "')";
+				$query_res_invo = mysqli_query($con, $insert_invoice_item);
+
+				$gatway_order_id = $invoice_id . '-UID-' . $user_id;
+				if ($payment == '1') {
+					$payment_type = 'Wallet';
+				} else {
+					$payment_type = 'Free by Admin';
+				}
+				$user_name = $userDetails['name'];
+				$email = $userDetails['email'];
+				$insert_invoice = "insert into gateways_payments (user_id, invoice_db_id, gatway_invoice_id, gatway_order_id, payment_type, item_type, name, email, item_name, item_number, paid_amount, paid_amount_currency, payment_status,created) VALUES ('" . $user_id . "','" . $invoice_db_id . "','" . $invoice_id . "', '" . $gatway_order_id . "','" . $payment_type . "','" . $item_type . "','" . $user_name . "','" . $email . "','Stripe Myphonesystems', '" . $item_number . "','" . $invoice_amount . "','" . $invoice_currency . "','success','" . date('Y-m-d H:i:s') . "')";
+				$query_res = mysqli_query($con, $insert_invoice);
+				$invo_id = mysqli_insert_id($con);
+
+				/******   END   ******* */
+
+				$activity_type = 'DID Assign To user';
+				$msg = 'DID No: ' . $did_num . ' ' . 'DID Assign to user Successfully!' . ' ' . $payment_status . ' ' . 'By Admin';
+				user_activity_log($_POST['selectedUser'], $_POST['clientId'], $activity_type, $msg);
+
+				$_SESSION['msg'] = "Inbound Added Successfully";
+				make_pdf($invoice_db_id, $_POST['selectedUser']);
+				echo '<script>window.location.href="inbound.php"</script>';
+			}
 		}
 	}
-
 }
 
 ?>
@@ -269,7 +275,7 @@ if (isset($_POST['submit'])) {
 									</div>
 									<div class="col-12 col-md-8">
 										<select id="numberpool" name="numberpool" class="form-control-sm form-control">
-											<option value="" selected="selected">Select</option>
+											<option selected="selected">Select</option>
 											<option value="">All</option>
 											<?php
 											foreach ($numberpool as $value) { ?>
@@ -294,18 +300,19 @@ if (isset($_POST['submit'])) {
 											<option value="">Select</option>
 											<?php
 											if (isset($_POST['did_or_tfn'])) {
-												$select_match_tfn = "SELECT id, did FROM `cc_did` where id = '" . $_POST['did_or_tfn'] . "'";
+												$select_match_tfn = "SELECT id, did , reserved FROM `cc_did` where id = '" . $_POST['did_or_tfn'] . "'";
 												$result_tfn_match = mysqli_query($connection, $select_match_tfn);
 												while ($row_tfn = mysqli_fetch_array($result_tfn_match)) { ?>
 													<option <?php if ($row_tfn['id'] == $_POST['did_or_tfn']) {
 														echo 'selected="selected"';
 													} else {
 														echo '';
-													} ?>
-														value="<?php echo $row_tfn['id']; ?>">
+													} ?> value="<?php echo $row_tfn['id']; ?>">
 														<?php echo $row_tfn['did']; ?>
 													</option>
+
 												<?php }
+
 											} ?>
 										</select>
 									</div>
@@ -927,7 +934,15 @@ if (isset($_POST['submit'])) {
 			.find('option')
 			.remove()
 			.end();
-		// .append('<option value="">Select</option>');
+
+	});
+	$("select[name='selectedUser']").change(function () {
+		var slct = $(this).val();
+		$('#destination_type').prop('selectedIndex', 0);
+		$('#destinationSelect')
+			.find('option')
+			.remove()
+			.end();
 	});
 </script>
 <script>
@@ -993,6 +1008,7 @@ if (isset($_POST['submit'])) {
 		});
 
 	}
+
 
 </script>
 

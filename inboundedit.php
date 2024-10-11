@@ -234,6 +234,35 @@ if ($_SESSION['userroleforpage'] == 2 && $curruserid !== $_SESSION['login_user_i
 <?php } ?>
 
 
+<style>
+
+.bootstrap-select.btn-group .dropdown-menu {
+    min-width: 100%;
+    z-index: 1035;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+}
+/*
+@media only screen and (max-width: 362px) {
+.bootstrap-select.btn-group .dropdown-menu {
+    margin-top: 273px!important;
+	margin-left: 80px;
+}
+}
+
+@media only screen and (max-width: 756px) {
+.bootstrap-select.btn-group .dropdown-menu {
+    margin-top: 272px!important;
+}
+}
+@media only screen and (max-width: 992px) {
+.bootstrap-select.btn-group .dropdown-menu {
+    margin-top: 250px!important;
+}
+}*/
+</style>
 
 <div class="main-content">
 	<div class="section__content section__content--p30 page_mid">
@@ -697,7 +726,15 @@ if ($_SESSION['userroleforpage'] == 2 && $curruserid !== $_SESSION['login_user_i
 			.end()
 			.append('<option value="">Select</option>');
 	});
-
+        $("select[name='selectedUser']").change(function () {
+		var sltt = $(this).val();
+		$('#destination_type').prop('selectedIndex', 0);
+		$('#destination')
+			.find('option')
+			.remove()
+			.end()
+			.append('<option value="">Select</option>');
+	});
 	/*
 	$( "select[name='destination_type']" ).change(function () {
 		var selectedUSERS = $(this).val();

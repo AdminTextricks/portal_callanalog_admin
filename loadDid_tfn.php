@@ -12,7 +12,7 @@ if (mysqli_num_rows($user_res) > 0) {
 }
 
 
-$sql = "SELECT id, did FROM `cc_did` where did like '%$digit%' and iduser='0' and clientid='0' and did_provider IN ('" . $did_permission . "') and id NOT IN(select id_cc_did from cc_did_destination)";
+$sql = "SELECT id, did FROM `cc_did` where did like '%$digit%' and iduser='0' and activated='1' and reserved='0' and clientid='0' and did_provider IN ('" . $did_permission . "') and id NOT IN(select id_cc_did from cc_did_destination)";
 
 $result = mysqli_query($connection, $sql) or die("query failed");
 

@@ -176,7 +176,7 @@ if (isset($_POST['submit'])) {
 
 								<div class="col-sm-12 col-md-8 col-lg-8 col-xs-12">
 									<!-- <h4 class="badge-pill badge-light mt-3 mb-3 p-2 text-center">Products</h4>-->
-
+									<div id="warning"></div>
 									<table class="table table-bordered" id="numberss">
 										<thead>
 											<tr>
@@ -188,7 +188,7 @@ if (isset($_POST['submit'])) {
 										<tbody>
 											<?php
 											if ($_POST['destination_tfn'] == 'Local') {
-												$empQuery = "select id, did from cc_did WHERE iduser = '0' and clientId = '0' and id_cc_country='" . $_POST['countryId'] . "' or (status='Suspended' and activated='0' and  iduser = '" . $_SESSION['login_user_id'] . "')";
+												$empQuery = "select id, did from cc_did WHERE iduser = '0'and reserved = '0' and clientId = '0' and id_cc_country='" . $_POST['countryId'] . "' or (status='Suspended' and activated='0' and  iduser = '" . $_SESSION['login_user_id'] . "')";
 											} else {
 												//$user_id = ;
 										
@@ -198,7 +198,7 @@ if (isset($_POST['submit'])) {
 													$row = mysqli_fetch_assoc($user_res);
 													$did_permission = str_replace(",", "','", $row['did_permission']);
 												}
-												$empQuery = "select id, did from cc_did WHERE did like '%" . $_POST['numberpool'] . "%' and id_cc_country='" . $_POST['countryId'] . "' and iduser = '0' and clientId = '0'  and did_provider IN ('" . $did_permission . "') or (status='Suspended' and activated='0' and  iduser = '" . $_SESSION['login_user_id'] . "')";
+												$empQuery = "select id, did from cc_did WHERE did like '%" . $_POST['numberpool'] . "%' and id_cc_country='" . $_POST['countryId'] . "' and activated='1' and iduser = '0' and reserved = '0' and clientId = '0'  and did_provider IN ('" . $did_permission . "') or (status='Suspended' and activated='0' and  iduser = '" . $_SESSION['login_user_id'] . "')";
 											}
 
 											## Fetch records
@@ -315,7 +315,13 @@ if (isset($_POST['submit'])) {
 				name: productDom.querySelector(".product-name").innerText,
 				price: productDom.querySelector(".product-price").innerText,
 				quantity: 1
+				
 			};
+			// reserveDID(product.name);
+			reserveDID(product.name).then(response => {
+        var is_reserve = response;
+        console.log("Function call:- " + is_reserve);
+		if(is_reserve == 0){
 			const IsinCart = cart.filter(cartItem => cartItem.name === product.name).length > 0;
 			if (IsinCart === false) {
 				cartDom.insertAdjacentHTML("beforeend", `<div class="row">
@@ -331,7 +337,7 @@ if (isset($_POST['submit'])) {
 		  <p class="text-success cart_item_quantity" >${product.quantity}</p>
 		</div>
 		<div class="p-2 mt-3">
-		  <button class="btn badge badge-danger btn btn-danger btn-sm" type="button" data-action="remove-item">&times;
+		  <button class="btn badge badge-danger btn btn-danger btn-sm" onclick="unreserveDID('${product.name}')" type="button" data-action="remove-item">&times;
 		</div>
 		</div>
 		</div>
@@ -378,7 +384,13 @@ if (isset($_POST['submit'])) {
 							});
 						});
 						//clear cart
+
+					
+					
 						document.querySelector('[data-action="clear-cart"]').addEventListener("click", () => {
+							cart.forEach(cartItem => {
+                           unreserveDID(cartItem.name);
+                                  });
 							cartItemDom.remove();
 							cart = [];
 							cartTotal = 0;
@@ -388,6 +400,7 @@ if (isset($_POST['submit'])) {
 							addtocartbtnDom.innerText = "Add to cart";
 							addtocartbtnDom.disabled = false;
 						});
+					
 						document.querySelector('[data-action="check-out"]').addEventListener("click", () => {
 							if (document.getElementById('paypal-form') === null) {
 								checkOut();
@@ -396,6 +409,10 @@ if (isset($_POST['submit'])) {
 					}
 				});
 			}
+		}
+    }).catch(error => {
+        console.error("Error: " + error);
+    });
 		});
 	});
 
@@ -419,6 +436,47 @@ if (isset($_POST['submit'])) {
 		document.querySelector('body').insertAdjacentHTML("beforeend", paypalHTMLForm);
 		document.getElementById("paypal-form").submit();
 	}
+
+
+	function reserveDID(productName) {
+		return new Promise((resolve, reject) => {
+    $.ajax({
+        url: 'ajax_reserve_did.php',
+        type: 'POST',
+        data: {
+            productName: productName,            
+        },
+        success: function(response) {
+            if (response == 0) { 
+				$("#warning").html('<div class="alert alert-success" role="alert">DID Reserved Successfully</div>'); 
+				resolve(response);           
+            } else {
+				$("#warning").html('<div class="alert alert-danger" role="alert">This DID already reserved,please select another DID</div>'); 
+				resolve(response);           
+			}	
+        },
+		error:function(error){
+			reject(error);
+		}
+    });
+});
+	// return status;
+}
+function unreserveDID(productName) {
+    $.ajax({
+        url: 'ajax_unreserve_did.php',
+        type: 'POST',
+        data: {
+            productName: productName,            
+        },
+        success: function(response) {
+            if (response == 1) { 
+				$("#warning").html('<div class="alert alert-success" role=danger"alert">DID Unreserved </div>');
+				resolve(response);            
+            } 	
+        }
+    });	
+}
 
 </script>
 

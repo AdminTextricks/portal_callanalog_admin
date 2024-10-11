@@ -62,15 +62,18 @@ if (isset($_POST['update'])) {
 	$zipcode = $_POST['zipcode'];
 	$status = $_POST['status'];
 
-	if (isset($_POST['did_permission'])) {
-		$did_provider = implode(",", $_POST['did_permission']);
-		$did_permission = $did_provider;
-	} else {
-		$message = "Please Select atleast one DID permission..!!";
-		$error = 'true';
-		$did_provider = '';
-	}
-
+        if ($_SESSION['userroleforpage'] == 1) {
+        if (isset($_POST['did_permission'])) {
+            $did_provider = implode(",", $_POST['did_permission']);
+            $did_permission = $did_provider;
+        } else {
+            $message = "Please Select atleast one DID permission..!!";
+            $error = 'true';
+            $did_provider = '';
+        }
+    } else {
+        $did_permission = $fetch_did_provider;
+    }
 	if ($_POST['status'] == 'Active') {
 		$cc_status = '1';
 	} else {
@@ -151,6 +154,16 @@ if (isset($_POST['update'])) {
 				mysqli_query($connection, $update_ext_price) or die("query failed : update_ext_price");
 			}
 
+		} elseif ($fetch_role == '4') {
+			if ($filename != '') {
+				move_uploaded_file($tempname, $folder);
+				$query1 = "UPDATE `users_login` SET `email` = '" . $email . "', `name` = '" . $name . "',`timezone` = '" . $timezone . "',`status` = '" . $status . "',`profile_image` = '" . $filename . "',`did_permission`='" . $did_permission . "' WHERE `id`='" . $user_id . "'";
+			} else {
+				$query1 = "UPDATE `users_login` SET `email` = '" . $email . "', `name` = '" . $name . "',`timezone` = '" . $timezone . "',`status` = '" . $status . "',`did_permission`='" . $did_permission . "'  WHERE `id`='" . $user_id . "'";
+			}
+			mysqli_query($connection, $query1) or die("query failed");
+			$query2 = "UPDATE `cc_card`  SET `lastname` = '" . $name . "', `firstname`='" . $name . "',`status`= '" . $cc_status . "',`address` = '" . $address . "',`state`='" . $state . "',`country`='" . $country . "',`zipcode`='" . $zipcode . "',`tariff` = '" . $tariff . "',`phone`='" . $phone . "', `email` = '" . $email . "',`trunk_id` = '" . $trunk_id . "' WHERE `id`='" . $user_id . "'";
+			mysqli_query($connection, $query2) or die("query failed");
 		} else {
 
 			if ($filename != '') {

@@ -1,5 +1,6 @@
 <?php require_once ('header.php'); ?>
 
+
 <div class="main-content">
     <div class="section__content section__content--p30 page_mid">
         <div class="container-fluid">
@@ -27,18 +28,19 @@
                 }
                 $item_name[] = $_GET['item_name'];
                 $quantity[] = 1;
+                $renew = 1;
             } else {
-                $item_name = $_POST['item_name']; //item_number
+                $item_name = $_POST['item_name'];
                 $amount_array = $_POST['amount'];
                 $quantity = $_POST['quantity'];
+                $renew = "";
             }
+
             $invoice_amount = 0;
             $payment_status = 'Unpaid';
             $item_type = 'DID';
 
-            /* foreach($item_name as $key => $item){
-                $invoice_amount = $invoice_amount+ $amount[$key];
-            } */
+            $item_names_list = [];
 
             foreach ($amount_array as $key => $amount) {
                 $invoice_amount = $invoice_amount + $amount;
@@ -48,12 +50,22 @@
             $query_res = mysqli_query($con, $insert_invoice);
             $invo_id = mysqli_insert_id($con);
 
+
             foreach ($item_name as $key => $item) {
                 $item_price = $amount_array[$key];
 
                 $insert_invoice_item = "insert into invoices_items (invoice_id, item_type, item_number, price) VALUES ('" . $invo_id . "','" . $item_type . "','" . $item . "','" . $item_price . "')";
                 $query_res_invo = mysqli_query($con, $insert_invoice_item);
+                $update_reserved = "UPDATE cc_did SET `reserved` = '1' WHERE `did`='" . $item . "'";
+                mysqli_query($con, $update_reserved);
             }
+            if ($renew == "") {
+                $items = implode(",", $item_name);
+                $activity_type = 'DID Invoice Generated';
+                $message = 'DID No: ' . $items . ' ' . 'Invoice Generate Succesfully!';
+                user_activity_log($_SESSION['login_user_id'], $_SESSION['userroleforclientid'], $activity_type, $message);
+            }
+
             ?>
             <div class="row">
                 <div class="col-12">
@@ -78,10 +90,7 @@
             $plan_res = mysqli_query($connection, $select_plan);
             if (mysqli_num_rows($plan_res) > 0) {
                 $plan_details = mysqli_fetch_assoc($plan_res);
-
             }
-
-
             ?>
             <div class="row">
                 <div class="col-sm-6 col-md-8">
@@ -210,10 +219,10 @@
                     <span class="text-secondary-d1 text-105">Thank you for your business</span>
                 </div>
                 <div class="text-right">
-                    <a href="PayWithCrypto.php?id=<?php echo base64_encode($invo_id); ?>"
+                    <a href="PayWithCrypto.php?id=<?php echo base64_encode($invo_id); ?>&renew=<?php echo $renew; ?>"
                         class="btn btn-info btn-bold px-4  mt-3 mt-lg-0">Pay With Crypto</a>
                     &nbsp;&nbsp;
-                    <a href="PayNow.php?id=<?php echo base64_encode($invo_id); ?>"
+                    <a href="PayNow.php?id=<?php echo base64_encode($invo_id); ?>&renew=<?php echo $renew; ?>"
                         class="btn btn-info btn-bold px-4  mt-3 mt-lg-0">Pay Now</a>
                     &nbsp;&nbsp;
                     <?php
@@ -223,7 +232,7 @@
                         <button class="btn btn-info btn-bold px-4 float-right mt-3 mt-lg-0" id="lowbalance"
                             onclick="lowbalance()">Pay With Wallet</button>&nbsp;&nbsp;
                     <?php } else { ?>
-                        <a href="walletpayNow.php?id=<?php echo base64_encode($invo_id); ?>"
+                        <a href="walletpayNow.php?id=<?php echo base64_encode($invo_id); ?>&renew=<?php echo $renew; ?>"
                             class="btn btn-info btn-bold px-4 float-right mt-3 mt-lg-0">Pay With Wallet</a>&nbsp;&nbsp;
                     <?php } ?>
                 </div>

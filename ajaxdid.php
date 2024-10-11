@@ -109,6 +109,10 @@ $i = 1;
 
 while ($row = mysqli_fetch_assoc($empRecords)) {
 
+	$edit_link = '<a href="didedit.php?id=' . $row['id'] . '">
+<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
+<i class="fa fa-pencil-square-o"></i>
+</button></a>';
 	$query_country = "select countryname from cc_country WHERE id='" . $row['id_cc_country'] . "' LIMIT 1";
 	$result_country = mysqli_query($connection, $query_country);
 	$row_country = mysqli_fetch_assoc($result_country);
@@ -131,16 +135,7 @@ while ($row = mysqli_fetch_assoc($empRecords)) {
 		"aleg_retail_increment" => $row['aleg_retail_increment'],
 		"countryname" => $countryname,
 		"activated" => $status,
-		"action" => '<div class="table-data-feature">
-<a href="didedit.php?id=' . $row['id'] . '">
-<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
-<i class="fa fa-pencil-square-o"></i>
-</button></a>
-<!--<a href="queuemanage.php?id=' . $row['id'] . '">
- <button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Manage">
-<i class="fa fa-users"></i> 
-</button></a>-->
-</div>'
+		"action" => '<div class="table-data-feature">'. $edit_link .'<a href="javascript:void(0)" onclick="return deletedids(' . $row['id'] . ');" type="button" class=""><button class="item" data-toggle="tooltip" type="button" data-placement="top" title="" data-original-title="delete"><i class="fa fa-trash-o"></i></button></a></div>'
 	);
 	$i++;
 }

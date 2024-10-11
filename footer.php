@@ -33,7 +33,7 @@
   }
 
   .btn-web {
-    
+
     background: none repeat scroll 0 0 #337ab7;
     border: medium none;
     color: white;
@@ -45,9 +45,10 @@
     transform: rotate(90deg);
     top: 168px;
     width: 200px;
-}
-.btn-win {
-    
+  }
+
+  .btn-win {
+
     background: none repeat scroll 0 0 #337ab7;
     border: medium none;
     color: white;
@@ -59,9 +60,7 @@
     transform: rotate(90deg);
     top: 400px;
     width: 200px;
-}
-    
-
+  }
 </style>
 <div class="loader">
   <div class="loading">
@@ -127,8 +126,8 @@ mysqli_close($connection);
     tempInput.select();
     document.execCommand("copy");
     document.body.removeChild(tempInput);
-     alert(" WEBPHONE URL COPIED");
-}
+    alert(" WEBPHONE URL COPIED");
+  }
 </script>
 
 <style>
@@ -154,17 +153,27 @@ mysqli_close($connection);
   }
 </style>
 <!--Start of Tawk.to Script-->
-<script type="text/javascript">
-var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/65a8aa878d261e1b5f54a938/1hkddk9g6';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
+<?php
+// Get the current page name
+
+// Check if the current page is not 'inboundreports.php' and the SERVER_FLAG is set to 1
+if (SERVER_FLAG == 1) { 
+?>
+  <script type="text/javascript">
+    var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+    (function () {
+      var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+      s1.async = true;
+      s1.src = 'https://embed.tawk.to/65a8aa878d261e1b5f54a938/1hkddk9g6';
+      s1.charset = 'UTF-8';
+      s1.setAttribute('crossorigin', '*');
+      s0.parentNode.insertBefore(s1, s0);
+    })();
+  </script>
+<?php
+}
+?>
+
 <!--End of Tawk.to Script-->
 
 <!-- Datatable JS -->
@@ -183,20 +192,26 @@ s0.parentNode.insertBefore(s1,s0);
 <script src="resources/vendor/perfect-scrollbar/perfect-scrollbar.js" type="text/javascript"></script>
 <script src="resources/vendor/select2/select2.min.js" type="text/javascript"></script>
 <script src="resources/js/main.js" type="text/javascript"></script>
+<?php
+$current_page = basename($_SERVER['SCRIPT_FILENAME']);
+if($current_page  != 'inboundRports.php') { ?>
+<script src="resources/js/bootstrap-select.min.js" type="text/javascript"></script>
+<?php } ?>
 
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>	
-								<!-- <button type="button" class="btn btn-primary btn-web" onclick="copyToClipboard()"> COPY WEB PHONE URL</button>  -->
-								<button type="button" class="btn btn-primary btn-win" onclick="window.open('https://agent.callanalog.com/callanalog/agent/', '_blank')">OPEN WEB PHONE</button>
+<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script> -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<!-- <button type="button" class="btn btn-primary btn-web" onclick="copyToClipboard()"> COPY WEB PHONE URL</button>  -->
+<button type="button" class="btn btn-primary btn-win"
+  onclick="window.open('https://agent.callanalog.com/callanalog/agent/', '_blank')">OPEN WEB PHONE</button>
 
-								
+
 
 </body>
 <script>
-                setTimeout(function() {
-                    var element = document.getElementById('message');
-                    element.parentNode.removeChild(element);
-                }, 2000);
-            </script>
+  setTimeout(function () {
+    var element = document.getElementById('message');
+    element.parentNode.removeChild(element);
+  }, 2000);
+</script>
 
 </html>

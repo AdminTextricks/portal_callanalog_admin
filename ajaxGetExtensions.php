@@ -20,8 +20,8 @@ while(1) {
         if($rowCount < 1 && count($number_array) > $extension_number-1) {
             break;
         }else{
-            $insert_number = "insert into tbl_rand (the_number) VALUES ('".$paded."')";
-            $query_res = mysqli_query($connection, $insert_number); 
+            // $insert_number = "insert into tbl_rand (the_number) VALUES ('".$paded."')";
+            // $query_res = mysqli_query($connection, $insert_number); 
             $number_array[] = $paded;
         }    
     }else{

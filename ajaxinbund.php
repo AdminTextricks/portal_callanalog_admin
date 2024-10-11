@@ -32,18 +32,18 @@ if ($searchValue != '') {
 
 ## Total number of records without filtering
 if ($_SESSION['userroleforpage'] == 1) {
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_did cdid LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE cdid.clientId = clnt.clientId");
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_did cdid LEFT JOIN users_login ul ON cdid.iduser=ul.id LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE cdid.clientId = clnt.clientId");
 } else {
-	$sel = mysqli_query($con, "select count(*) as allcount from cc_did cdid LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId where cdid.clientId = clnt.clientId and iduser=" . $_SESSION['login_user_id'] . "");
+	$sel = mysqli_query($con, "select count(*) as allcount from cc_did cdid LEFT JOIN users_login ul ON cdid.iduser=ul.id LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId where cdid.clientId = clnt.clientId and iduser=" . $_SESSION['login_user_id'] . "");
 }
 $records = mysqli_fetch_assoc($sel);
 $totalRecords = $records['allcount'];
 
 ## Total number of records with filtering
 if ($_SESSION['userroleforpage'] == 1) {
-	$sel1 = "SELECT count(*) as allcount FROM cc_did cdid LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE cdid.clientId = clnt.clientId  " . $searchQuery;
+	$sel1 = "SELECT count(*) as allcount FROM cc_did cdid LEFT JOIN users_login ul ON cdid.iduser=ul.id LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE cdid.clientId = clnt.clientId  " . $searchQuery;
 } else {
-	$sel1 = "SELECT count(*) as allcount FROM cc_did cdid LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE iduser=" . $_SESSION['login_user_id'] . " " . $searchQuery;
+	$sel1 = "SELECT count(*) as allcount FROM cc_did cdid LEFT JOIN users_login ul ON cdid.iduser=ul.id LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE iduser=" . $_SESSION['login_user_id'] . " " . $searchQuery;
 }
 $selll = mysqli_query($con, $sel1);
 $recordss = mysqli_fetch_assoc($selll);
@@ -52,13 +52,12 @@ $totalRecordwithFilter = $recordss['allcount'];
 ## Fetch records
 //$empQuery = "select cdid.did as did, cdid.carieer as carieer, cdid.didtype as didtype, cdid.call_destination as call_destination,cdid.status as status,cdid.call_screening_action as call_screening_action from cc_did cdid WHERE 1 ".$searchQuery." order by ".$columnName." ".$columnSortOrder." limit ".$row.",".$rowperpage;
 if ($_SESSION['userroleforpage'] == 1) {
-	$empQuery = "SELECT cdid.id as id,cdid.did_provider, users_login.role,users_login.plan_id, cdid.did AS did,ul.name AS uname, clnt.clientEmail AS clientEmail,ul.email AS email, clnt.clientName AS clientName, cdid.carieer AS carieer, cdid.didtype AS didtype, cdid.call_destination AS call_destination,cdid.expirationdate, cdid.status AS status , cdid.call_screening_action AS call_screening_action
+	$empQuery = "SELECT cdid.id as id,cdid.did_provider, ul.role,ul.plan_id, cdid.did AS did,ul.name AS uname,cdid.activated AS activated, clnt.clientEmail AS clientEmail,ul.email AS email, clnt.clientName AS clientName, cdid.carieer AS carieer, cdid.didtype AS didtype, cdid.call_destination AS call_destination,cdid.expirationdate, cdid.status AS status , cdid.call_screening_action AS call_screening_action
 FROM cc_did cdid
-RIGHT JOIN users_login ul ON cdid.iduser = ul.id 
-LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId LEFT JOIN users_login ON cdid.iduser = users_login.id WHERE cdid.clientId = clnt.clientId " . $searchQuery . " order by " . $columnName . " " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
+LEFT JOIN Client clnt ON cdid.clientId = clnt.clientId LEFT JOIN users_login ul ON cdid.iduser = ul.id WHERE cdid.clientId = clnt.clientId " . $searchQuery . " order by " . $columnName . " " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
 } else {
-	$empQuery = "SELECT cdid.id as id,cdid.did_provider, cdid.did AS did, clnt.clientEmail AS clientEmail, clnt.clientName AS clientName, cdid.carieer AS carieer, cdid.didtype AS didtype, cdid.call_destination AS call_destination,cdid.expirationdate, cdid.status AS status , cdid.call_screening_action AS call_screening_action
-FROM cc_did cdid
+	$empQuery = "SELECT cdid.id as id,cdid.did_provider, cdid.did AS did, clnt.clientEmail AS clientEmail,cdid.activated AS activated, clnt.clientName AS clientName, cdid.carieer AS carieer, cdid.didtype AS didtype, cdid.call_destination AS call_destination,cdid.expirationdate, cdid.status AS status , cdid.call_screening_action AS call_screening_action
+FROM cc_did cdid LEFT JOIN users_login ul ON cdid.iduser=ul.id
 RIGHT JOIN Client clnt ON cdid.clientId = clnt.clientId WHERE iduser=" . $_SESSION['login_user_id'] . " " . $searchQuery . " order by " . $columnName . " " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
 }
 // echo $empQuery;exit;
@@ -84,14 +83,14 @@ while ($row = mysqli_fetch_assoc($empRecords)) {
 	$action = '';
 	$userType = $user_type_arr[$row['role']];
 
-	if ($row['status'] == 'Suspended' && $_SESSION['userroleforpage'] == 2) {
+	if ($row['status'] == 'Suspended' && $row['activated']=='0' && $_SESSION['userroleforpage'] == 2) {
 		$action = '<div class="table-data-feature">
 	<a href="create_invoice.php?item_name=' . $row['did'] . '">
 	<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Renew">
 	<i class="fa fa-repeat"></i>
 	</button></a>
 	</div>';
-	} elseif ($row['status'] == 'Suspended' && $_SESSION['userroleforpage'] == 1 && in_array($row['role'], array(2, 3, 4))) {
+	} elseif ($row['status'] == 'Suspended' && $row['activated']=='0' && $_SESSION['userroleforpage'] == 1 && in_array($row['role'], array(2, 3, 4))) {
 		$action = '<div class="table-data-feature">
 	<a href="inboundedit.php?id=' . $row['id'] . '&ren=yes">
 	<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Renew">
@@ -106,18 +105,27 @@ while ($row = mysqli_fetch_assoc($empRecords)) {
 	</button></a>';
 
 		/* if(in_array($row['role'], array(3,4))){
-					 $edit_link = '<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
-				 <i class="fa fa-ban"></i>
-				 </button>';
-				 }else{
-					 $edit_link = '<a href="inboundedit.php?id='.$row['id'].'">
-				 <button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
-				 <i class="fa fa-pencil-square-o"></i>
-				 </button></a>';
-				 } */
+																				 $edit_link = '<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
+																			 <i class="fa fa-ban"></i>
+																			 </button>';
+																			 }else{
+																				 $edit_link = '<a href="inboundedit.php?id='.$row['id'].'">
+																			 <button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit">
+																			 <i class="fa fa-pencil-square-o"></i>
+																			 </button></a>';
+																			 } */
 
 		$action = '<div class="table-data-feature">' . $edit_link . '<a href="javascript:void(0)" onclick="return InbounddeleteContent(' . $row['id'] . ');" type="button" class=""><button class="item" data-toggle="tooltip" type="button" data-placement="top" title="" data-original-title="delete"><i class="fa fa-trash-o"></i></button></a>
 	</div>';
+	}
+
+	if ($_SESSION['userroleforpage'] == 2) {
+		$renew_option = '<br> <a href="create_invoice.php?item_name=' . $row['did'] . '" style="font-size:20px;background:white;">
+			<button class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Renew">
+			<i class="fa fa-repeat"></i>
+			</button></a>';
+	} else {
+		$renew_option = "";
 	}
 	if ($row['user_id'] == $_SESSION['login_user_id']) {
 		$user_name = '';
@@ -132,11 +140,11 @@ while ($row = mysqli_fetch_assoc($empRecords)) {
 
 	// if($_SESSION['login_user_plan_id'] == 0 || ($_SESSION['userroleforpage'] == 1 && $row['plan_id'] == 0)){
 	if ($daysleft == 1) {
-		$msg = 'Expire Today';
+		$msg = 'Expire Today' . $renew_option;
 	} elseif ($daysleft <= 0) {
 		$msg = 'Expired';
 	} elseif ($today < $expire && $daysleft <= 3) {
-		$msg = 'Expire in ' . $daysleft . ' Days';
+		$msg = 'Expire in ' . $daysleft . ' Days' . $renew_option;
 	} else {
 		$msg = '';
 	}

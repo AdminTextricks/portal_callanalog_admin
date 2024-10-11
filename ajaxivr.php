@@ -15,8 +15,8 @@ $searchQuery = " ";
 if ($searchValue != '') {
 	$searchQuery = " and (crg.ivr_name like '%" . $searchValue . "%' or 
          crg.ivr_timeout like '%" . $searchValue . "%' or 
-         crg.ivr_status like '%" . $searchValue . "%' )";
-	// Client.clientName like'%".$searchValue."%' ) ";
+         crg.ivr_status like '%" . $searchValue . "%' or
+	 Client.clientName like'%".$searchValue."%' ) ";
 	// crg.ringlist like '%".$searchValue."%' or 
 // crg.ringtime like '%".$searchValue."%' or
 // crg.description like '%".$searchValue."%' or
@@ -43,8 +43,8 @@ if ($_SESSION['userroleforpage'] == 1) {
 	}
 	$resultings = $array_result;
 	$ring_id = "'" . implode("', '", $resultings) . "'";
-	$queuenamesid = 'where id in ("' . $ring_id . '")';
-	$queuenamesidss = 'crg.id in ("' . $ring_id . '")';
+	$queuenamesid = 'where id in (' . $ring_id . ')';
+	$queuenamesidss = 'crg.id in (' . $ring_id . ')';
 
 }
 
@@ -53,7 +53,7 @@ if ($_SESSION['userroleforpage'] == 1) {
 } else {
 	$sel1 = "select count(*) as allcount from ivr " . $queuenamesid . "";
 }
-// echo $sel1;exit;
+//echo $sel1;exit;
 $sel = mysqli_query($con, $sel1);
 if (mysqli_num_rows($sel) > 0) {
 	$records = mysqli_fetch_assoc($sel);
@@ -65,10 +65,11 @@ if (mysqli_num_rows($sel) > 0) {
 
 ## Total number of records with filtering
 if ($_SESSION['userroleforpage'] == 1) {
-	$sel2 = "select count(*) as allcount from ivr crg WHERE 1 " . $queuenamesidss . " " . $searchQuery;
+	$sel2 = "select count(*) as allcount from ivr crg left join users_login ON crg.user_id=users_login.id left join Client ON crg.clientid=Client.clientId left join  music ON crg.ivr_announcement=music.id WHERE 1 " . $queuenamesidss . " " . $searchQuery;
 } else {
-	$sel2 = "select count(*) as allcount from ivr crg WHERE " . $queuenamesidss . " " . $searchQuery;
+	$sel2 = "select count(*) as allcount from ivr crg left join users_login ON crg.user_id=users_login.id left join Client ON crg.clientid=Client.clientId left join  music ON crg.ivr_announcement=music.id WHERE " . $queuenamesidss . " " . $searchQuery;
 }
+// echo $sel2;exit;
 $sel2 = mysqli_query($con, $sel2);
 if (mysqli_num_rows($sel2) > 0) {
 	$records = mysqli_fetch_assoc($sel2);
@@ -76,13 +77,14 @@ if (mysqli_num_rows($sel2) > 0) {
 } else {
 	$totalRecordwithFilter = 1;
 }
+// echo $totalRecordwithFilter;exit;
 ## Fetch records
 if ($_SESSION['userroleforpage'] == 1) {
 	$empQuery = "select crg.*, music.upload_music,music.file_ext, users_login.id as userid, users_login.email, users_login.name, users_login.status, users_login.role,  Client.clientName from ivr crg left join users_login ON crg.user_id=users_login.id left join Client ON crg.clientid=Client.clientId left join  music ON crg.ivr_announcement=music.id WHERE 1 " . $queuenamesidss . " " . $searchQuery . " order by " . $columnName . " " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
 } else {
 	$empQuery = "select crg.*,music.upload_music,music.file_ext, users_login.id as userid, users_login.email, users_login.name, users_login.status, users_login.role, Client.clientName from ivr crg left join users_login ON crg.user_id=users_login.id left join Client ON crg.clientid=Client.clientId left join music ON crg.ivr_announcement=music.id WHERE " . $queuenamesidss . " " . $searchQuery . " order by " . $columnName . " " . $columnSortOrder . " limit " . $row . "," . $rowperpage;
 }
-// echo $empQuery;exit;
+//  echo $empQuery;exit;
 $empRecords = mysqli_query($con, $empQuery);
 // echo mysqli_num_rows($empRecords);
 $data = array();

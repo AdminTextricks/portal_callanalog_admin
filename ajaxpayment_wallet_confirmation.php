@@ -45,20 +45,14 @@ if ($response === false) {
         // Output the payment status
         // echo 'Payment Status: ' . $responseData['payment_status'];
         // Add more handling of payment status as needed
-    } /* else {
-      echo 'HTTP Error: ' . $httpCode;
-      // Print detailed cURL request/response information
-      echo "\nResponse:\n$response\n";
-  } */
+    }
 }
 curl_close($curl);
-// $responseData['payment_status'] === "finished";
-// $pdata= "partially_paid";
 
-// echo"<pre>";print_r($gateway_invo_id);die;
 if ($responseData['payment_status'] == "finished" || $responseData['payment_status'] == "partially_paid") {
-// if ($responseData['payment_status'] == "finished" || $pdata == "partially_paid") {
-
+    if (isset($responseData['actually_paid']) && $responseData['actually_paid'] !== $responseData['pay_amount']) {
+        $paid_amount = $responseData['actually_paid'];
+    }
     if ($gateway_invo_id > 0) {
         $update_sql = "update `invoices` set payment_status='Paid' where id='" . $invoice_id . "'";
         $update_res = mysqli_query($connection, $update_sql);
@@ -73,7 +67,7 @@ if ($responseData['payment_status'] == "finished" || $responseData['payment_stat
             $_SESSION['login_user_credits'] = $balance;
             // echo"<pre>";print_r($order_id);die;
             $created_at = date('Y-m-d h:i:s');
-            $insert_cerdit = "insert into recharge_history (`user_id`,`current_bal`,`add_bal`,`total_bal`,`currency`,`recharged_by`,`created_at`) values ('" . $user_id . "','" . $old_balance . "','" . $paid_amount . "','" . $balance . "','BTC','Self','" . $created_at . "')";
+            $insert_cerdit = "insert into recharge_history (`user_id`,`current_bal`,`add_bal`,`total_bal`,`currency`,`recharged_by`,`created_at`) values ('" . $user_id . "','" . $old_balance . "','" . $paid_amount . "','" . $balance . "','USDT','Self','" . $created_at . "')";
             $resultinsert = mysqli_query($connection, $insert_cerdit);
 
             $user_select = "update `cc_card` set credit='" . $balance . "' where id='" . $user_id . "'";
@@ -81,7 +75,7 @@ if ($responseData['payment_status'] == "finished" || $responseData['payment_stat
         }
 
         $activity_type = 'Amount Credit in Wallet';
-        $message = 'Invoice ID: ' . $invoice_id . ' Amount Credit Succesfully!';
+        $message = 'Amount: ' . $balance . ' Amount Credit Succesfully!';
         user_activity_log($user_id, $_SESSION['userroleforclientid'], $activity_type, $message);
     }
     make_pdf($invoice_id, $user_id);
@@ -90,16 +84,10 @@ if ($responseData['payment_status'] == "finished" || $responseData['payment_stat
 
     $Status = 'Success';
     $message = 'Payment has been done and credit hass been added in your Wallet.';
-    //     $activity_type = $item_type . ' ' . 'Add Balance';
-    //     $message = $item_type . ' ' . 'No: ' . $item_number . ' ' . $item_type . ' ' . 'Balance added Succesfully! By User From Crypto';
-    //     user_activity_log($user_id, $_SESSION['userroleforclientid'], $activity_type, $message);
-    //     $Status = 'Success';
-    //     $message = 'Payment has been done.';
-    // }
-    // make_pdf($invoice_id, $user_id);
-    // $gatway_up = "UPDATE `gateways_payments` SET `payment_status` = 'Paid' WHERE `id` = '" . $gateway_invo_id . "'";
-    // mysqli_query($connection, $gatway_up) or die("Query failed : gatway_up");
+} elseif ($responseData['payment_status'] == "failed") {
+    $btc_up = "UPDATE `btc_gateways` SET `payment_status`='" . $responseData['payment_status'] . "' WHERE `payment_id`='" . $payment_id . "'";
+    mysqli_query($connection, $btc_up) or die("query failed : btc_up");
 }
 
 echo $responseData['payment_status'];
-// echo "finished";
+

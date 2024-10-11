@@ -1,9 +1,9 @@
-<?php require_once('header.php');
+<?php require_once ('header.php');
 // include('phpqrcode/qrlib.php');
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-include('phpqrcode/qrlib.php');
+include ('phpqrcode/qrlib.php');
 
 
 $pay_address = $_GET['pay_address'];
@@ -69,7 +69,7 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
                             <div>
                                 <h4 class="common">Total Amount Pay:</h4>
                                 <p class="common order">
-                                    <?php echo $pay_amount . " BTC"; ?> <br>
+                                    <?php echo $pay_amount . " USDT"; ?> <br>
                                 </p>
                             </div>
                             <div>
@@ -97,7 +97,8 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
                                 <p class="common order">
                                     <button class="btn btn-primary">
                                         <span id="payment_status"></span>
-                                    </button><br> <span>Please Do Not Back...<br>Until Payment Status Finished</span>
+                                    </button><br> <span>Please Do Not Back for 5 to 10 mintues...<br>Until Payment
+                                        Status Finished</span>
                                 </p>
                             </div>
                         </div>
@@ -107,8 +108,9 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
         </div>
     </div>
 </div>
-<?php require_once('footer.php'); ?>
+<?php require_once ('footer.php'); ?>
 <script>
+
     var payment_id = <?php echo $payment_id; ?>;
     var invoice_id = <?php echo $invoice_id; ?>;
     var user_id = <?php echo $_SESSION['login_user_id']; ?>;
@@ -121,24 +123,9 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
     var item_type = '<?php echo $item_type; ?>';
     var accountcode = '<?php echo $accountcode; ?>';
     var paid_amount = <?php echo $paid_amount; ?>;
- 
-    /*  $(document).on("load", function () {
-         $.ajax({
-             url: 'ajaxpayment_confirmation.php',
-             type: 'post',
-             data: { payment_id: payment_id, invoice_id: invoice_id, user_id: user_id, gateway_invo_id: gateway_invo_id, email: email, username: username, item_name: item_name, item_number: item_number, payment_type: payment_type, item_type: item_type },
-             success: function (data) {
-                 var a = data.replace(/^\s+|\s+$/gm, '');
-                 if (a == "finished") {
-                     window.location.href = "payment_successfull.php";
-                 } else {
-                     $("#payment_status").text(data);
-                 }
-             }   
-         });
-     }); */
 
-    setInterval(get_status, 10000);
+
+    setInterval(get_status, 20000);
     function get_status() {
         $.ajax({
             url: 'ajaxpayment_wallet_confirmation.php',
@@ -155,12 +142,17 @@ QRcode::png($pay_address, $pngAbsoluteFilePath, QR_ECLEVEL_L, 3, 4);
                 payment_type: payment_type,
                 item_type: item_type,
                 accountcode: accountcode,
-                paid_amount:paid_amount
+                paid_amount: paid_amount
             },
-            success: function(data) {
+            success: function (data) {
                 var a = data.replace(/^\s+|\s+$/gm, '');
-                if (a == "finished") {
+                if (a == "finished" || a == "partially_paid") {
                     window.location.href = "payment_successfull.php";
+                } else if (a == "failed") {
+                    setTimeout(() => {
+                        window.location.href = "payment_error.php";
+                    }, 5000);
+
                 } else {
                     $("#payment_status").text(data);
                 }

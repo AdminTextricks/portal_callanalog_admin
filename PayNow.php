@@ -119,7 +119,7 @@ require_once('header.php');
                                             <input name="item_type" id="item_type" class="form-control input-field-pay"
                                                 type="text" value="<?php echo $item_type; ?>">
                                         </div>
-
+                                        <input type="hidden" name="renew_item" id="renew_item" value="<?php echo $_GET['renew'];?>" />
                                         <!-- Form submit button -->
                                         <button id="submitBtn" class="btn btn-success">
                                             <div class="spinner hidden" id="spinner"></div>

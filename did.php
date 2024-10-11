@@ -5,7 +5,7 @@
         <div class="container-fluid">
 
             <div class="row">
-            <div class="col-md-12">
+                <div class="col-md-12">
                     <div class="overview-wrap">
                         <div class="col-md-7">
                             <h2 class="title-1"> DID Information <span style="margin-left:50px;"></span></h2>
@@ -101,7 +101,7 @@
                                         { data: 'countryname' },
                                         { data: 'activated' },
                                         <?php if ($_SESSION['userroleforpage'] == 1) { ?>                                   
-                                                                    { data: 'action' },
+                                                                        { data: 'action' },
                                         <?php } ?>
 
                                     ],
@@ -111,7 +111,14 @@
                             }
                         });
                     </script>
-
+                    <script>
+                        function deletedids(id) {
+                            if (confirm('Are you sure you want to delete this ?')) {
+                                window.location = 'dids_delete.php?id=' + id;
+                            }
+                            return false;
+                        }
+                    </script>
                     <br>
                     <br>
                     <br>

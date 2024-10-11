@@ -86,7 +86,7 @@ require_once ('header.php');
                   'url': 'upload_documents_ajax.php'
                 },
                 'columns': [
-                  <?php if ($_SESSION['userroleforpage'] == 1) { ?>{ data: 'Select' }<?php } ?>,
+                  <?php if ($_SESSION['userroleforpage'] == 1) { ?>{ data: 'Select' },<?php } ?>
                   { data: 'clientName' },
                   { data: 'username' },
                   { data: 'clientEmail' },

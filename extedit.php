@@ -69,7 +69,7 @@ if (isset($_POST['submit'])) {
 		}
 		if ($error == 'false') {
 			$startingDate = date('Y-m-d H:i:s');
-			$expirationDate = date('Y-m-d H:i:s', strtotime('+1 month'));
+			$expirationDate = date('Y-m-d H:i:s', strtotime('+29 days'));
 			$renew_ext = "UPDATE `cc_sip_buddies` SET `host` = 'dynamic' ,`context`='textricks-outcall', `ext_status` = '1', `startingdate` = '" . $startingDate . "', `expirationdate` = '" . $expirationDate . "' WHERE `id`='" . $_GET['id'] . "'";
 			$res_renew = mysqli_query($connection, $renew_ext) or die("query failed : renew_ext");
 			$invoice_amount = 0;
@@ -176,10 +176,11 @@ if (isset($_POST['submit'])) {
 		}
 		if ($_POST['ivr'] == '1' || $_POST['ivr'] == '0') {
 
-
-			$result = shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
-			$result1 = shell_exec('sudo /var/www/html/callanalog/admin/transfer_2.sh');
-			echo $result1;
+			if (SERVER_FLAG == 1) {
+				$result = shell_exec('sudo /var/www/html/callanalog/admin/transfer.sh');
+				$result1 = shell_exec('sudo /var/www/html/callanalog/admin/transfer_2.sh');
+				sip_reload();
+			}
 			// if ($result1) {
 			// 	echo "File Transfer Successfully..";
 			// } else {
@@ -187,31 +188,31 @@ if (isset($_POST['submit'])) {
 			// }
 			// exit;
 			/* $srcFile = '/var/www/html/callanalog/admin/webrtc_template.conf';
-												   $dstFile = '/var/www/html/webrtc_template.conf';
+															$dstFile = '/var/www/html/webrtc_template.conf';
 
-												   // Establish an SSH2 connection to the remote server.
-												   $conn = ssh2_connect(RHOST, RPORT);
+															// Establish an SSH2 connection to the remote server.
+															$conn = ssh2_connect(RHOST, RPORT);
 
-												   if (!$conn) {
-													   die("Unable to connect to the remote server.");
-												   }
-												   // Authenticate with the private key.
+															if (!$conn) {
+																die("Unable to connect to the remote server.");
+															}
+															// Authenticate with the private key.
 
-												   if (ssh2_auth_pubkey_file($conn, RUSERNAME, PUBLIC_KEY, PRIVATE_KEY)) {
-													   // Securely transfer the file to the remote server.
-													   if (ssh2_scp_send($conn, $srcFile, $dstFile, 0644)) {
-														   echo "File transferred successfully.";
-													   } else {
-														   echo "Failed to transfer the file.";
-													   }
-												   } else {
-													   echo "Authentication failed.";
-												   }
+															if (ssh2_auth_pubkey_file($conn, RUSERNAME, PUBLIC_KEY, PRIVATE_KEY)) {
+																// Securely transfer the file to the remote server.
+																if (ssh2_scp_send($conn, $srcFile, $dstFile, 0644)) {
+																	echo "File transferred successfully.";
+																} else {
+																	echo "Failed to transfer the file.";
+																}
+															} else {
+																echo "Authentication failed.";
+															}
 
-												   // Close the SSH2 connection.
-												   ssh2_disconnect($conn); */
+															// Close the SSH2 connection.
+															ssh2_disconnect($conn); */
 
-			sip_reload();
+
 		}
 
 		// END FOR MEETME_ROOMS.CONF FILE ADD DATA ON IT:::	
@@ -272,7 +273,7 @@ if (isset($_POST['submit'])) {
 	}
 }
 
-$select_queuename = "SELECT  GROUP_CONCAT( cc_queue_member_table.queue_name ) as queuemember,cc_sip_buddies.clientId AS clientid,cc_sip_buddies.name as name,cc_sip_buddies.agent_name as agent_name, cc_sip_buddies.lead_operator as lead_operator, cc_sip_buddies.secret as secret,cc_sip_buddies.context as context, cc_sip_buddies.dtmfmode as dtmfmode,cc_sip_buddies.deny as deny, cc_sip_buddies.permit as permit,cc_sip_buddies.ipaddr as ipaddr,cc_sip_buddies.defaultuser as defaultuser, cc_sip_buddies.regexten as regexten,cc_sip_buddies.amaflags as amaflags,cc_sip_buddies.canreinvite as canreinvite,cc_sip_buddies.fromuser as fromuser,cc_sip_buddies.fromdomain as fromdomain,cc_sip_buddies.host as host,      cc_sip_buddies.dial_timeout as dial_timeout,cc_sip_buddies.type as type,cc_sip_buddies.qualify as qualify, cc_sip_buddies.port as port,cc_sip_buddies.disallow as disallow,cc_sip_buddies.allow as allow,cc_sip_buddies.regseconds as regseconds,cc_sip_buddies.fullcontact as fullcontact, cc_sip_buddies.lastms as lastms,cc_sip_buddies.rtpkeepalive as rtpkeepalive,cc_sip_buddies.useragent as useragent,cc_sip_buddies.fail_status as fail_status,cc_sip_buddies.fail_dest as fail_dest,      cc_sip_buddies.fail_data as fail_data,cc_sip_buddies.nat as nat,cc_sip_buddies.sip_type as sip_type,cc_sip_buddies.play_ivr as play_ivr ,cc_sip_buddies.accountcode as accountcode,cc_sip_buddies.callerid as calleriddd, cc_sip_buddies.context as context,cc_sip_buddies.id_cc_card as id_cc_card, cc_sip_buddies.user_id as user_id,  outbound_cid,recording FROM `cc_queue_member_table` left join cc_sip_buddies ON cc_queue_member_table.membername=cc_sip_buddies.name WHERE cc_sip_buddies.id='" . $_GET['id'] . "'";
+$select_queuename = "SELECT  GROUP_CONCAT( cc_queue_member_table.queue_name ) as queuemember,cc_sip_buddies.clientId AS clientid,cc_sip_buddies.name as name,cc_sip_buddies.agent_name as agent_name, cc_sip_buddies.lead_operator as lead_operator, cc_sip_buddies.secret as secret,cc_sip_buddies.context as context, cc_sip_buddies.dtmfmode as dtmfmode,cc_sip_buddies.deny as deny, cc_sip_buddies.permit as permit,cc_sip_buddies.ipaddr as ipaddr,cc_sip_buddies.defaultuser as defaultuser, cc_sip_buddies.regexten as regexten,cc_sip_buddies.amaflags as amaflags,cc_sip_buddies.canreinvite as canreinvite,cc_sip_buddies.fromuser as fromuser,cc_sip_buddies.fromdomain as fromdomain,cc_sip_buddies.host as host,      cc_sip_buddies.dial_timeout as dial_timeout,cc_sip_buddies.type as type,cc_sip_buddies.qualify as qualify, cc_sip_buddies.port as port,cc_sip_buddies.disallow as disallow,cc_sip_buddies.allow as allow,cc_sip_buddies.regseconds as regseconds,cc_sip_buddies.fullcontact as fullcontact, cc_sip_buddies.lastms as lastms,cc_sip_buddies.rtpkeepalive as rtpkeepalive,cc_sip_buddies.useragent as useragent,cc_sip_buddies.fail_status as fail_status,cc_sip_buddies.fail_dest as fail_dest,      cc_sip_buddies.fail_data as fail_data,cc_sip_buddies.nat as nat,cc_sip_buddies.sip_type as sip_type,cc_sip_buddies.play_ivr as play_ivr ,cc_sip_buddies.accountcode as accountcode,cc_sip_buddies.callerid as calleriddd, cc_sip_buddies.context as context,cc_sip_buddies.id_cc_card as id_cc_card, cc_sip_buddies.user_id as user_id,  outbound_cid,recording FROM `cc_queue_member_table` right join cc_sip_buddies ON cc_queue_member_table.membername=cc_sip_buddies.name WHERE cc_sip_buddies.id='" . $_GET['id'] . "'";
 $result_queuename = mysqli_query($connection, $select_queuename);
 $rowque = mysqli_fetch_assoc($result_queuename);
 //echo '<pre>'; print_r($rowque);exit;

@@ -1,11 +1,11 @@
-<?php require_once ('header.php');
+<?php require_once('header.php');
 
 if ($_SESSION['userroleforpage'] !== '1') {
-  ?>
+?>
   <script>
     window.location.href = "access_denied.php";
   </script>
-  <?php
+<?php
 }
 
 $query_user = "select * from users_login where role = '2' or role='3'";
@@ -49,7 +49,29 @@ if (isset($_POST['submit'])) {
 }
 
 ?>
+<style>
+  .bootstrap-select.btn-group .dropdown-menu {
+    min-width: 100%;
+    z-index: 1035;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 50%;
+  }
+  
+/* @media only screen and (max-width: 756px) {
+.bootstrap-select.btn-group .dropdown-menu {
+    margin-top: 27rem;
+}
+}
 
+@media only screen and (max-width: 992px) {
+.bootstrap-select.btn-group .dropdown-menu {
+    margin-top: 27rem;
+}
+} */
+  
+</style>
 
 <div class="main-content">
   <div class="section__content section__content--p30 page_mid">
@@ -78,8 +100,7 @@ if (isset($_POST['submit'])) {
                     <label for="text-input" class=" form-control-label">User Name</label>
                   </div>
                   <div class="col-12 col-md-9">
-                    <select id="clientId" name="clientId" data-show-subtext="false" data-live-search="true"
-                      onchange="showUser(this.value)" class="form-control selectpicker">
+                    <select id="clientId" name="clientId" data-show-subtext="false" data-live-search="true" onchange="showUser(this.value)" class="form-control selectpicker small-width">
                       <option value="">Select</option>
                       <?php while ($rows = mysqli_fetch_array($result_user)) { ?>
                         <option value="<?php echo $rows['id']; ?>">
@@ -94,12 +115,11 @@ if (isset($_POST['submit'])) {
                     <label for="text-input" class=" form-control-label">Credit</label>
                   </div>
                   <div class="col-12 col-md-9">
-                    <input id="credit" name="credit" placeholder="credit" required class="form-control" type="number"
-                      value="<?php if (isset($_POST['credit'])) {
-                        echo $_POST['credit'];
-                      } else {
-                        echo "";
-                      } ?>" />
+                    <input id="credit" name="credit" placeholder="credit" required class="form-control" type="number" value="<?php if (isset($_POST['credit'])) {
+                                                                                                                                echo $_POST['credit'];
+                                                                                                                              } else {
+                                                                                                                                echo "";
+                                                                                                                              } ?>" />
                   </div>
                 </div>
                 <div class="form-group pull-right">
@@ -125,7 +145,7 @@ if (isset($_POST['submit'])) {
       return;
     }
     var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
+    xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         document.getElementById("txtHint").innerHTML = this.responseText;
       }
@@ -135,4 +155,4 @@ if (isset($_POST['submit'])) {
   }
 </script>
 
-<?php require_once ('footer.php'); ?>
+<?php require_once('footer.php'); ?>

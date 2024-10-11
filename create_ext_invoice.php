@@ -29,8 +29,13 @@
             //$sipQuery = "select id_cc_card, name, callerid from cc_sip_buddies WHERE id_cc_card='' and clientId = '' and id='".$id."'";
             if (isset($_GET['ren']) && $_GET['ren'] == 1) {
                 $sipQuery = "select id_cc_card, name, callerid from cc_sip_buddies WHERE id='" . $id . "'";
-            } else {
+                $renew = 1;
+            } elseif (isset($_POST['renew']) && $_POST['renew'] == 1) {
+                $sipQuery = "select id_cc_card, name, callerid from cc_sip_buddies WHERE id IN (" . $_POST['ext_id'] . ")";
+                $renew = 1;
+            }else {
                 $sipQuery = "select id_cc_card, name, callerid from cc_sip_buddies WHERE exg_id='" . $id . "'";
+                $renew = "";
             }
 
             // echo $sipQuery;exit;
@@ -216,10 +221,10 @@
                     <span class="text-secondary-d1 text-105">Thank you for your business</span>
                 </div>
                 <div class="text-right">
-                <a href="PayWithCrypto.php?id=<?php echo base64_encode($invo_id); ?>"
+                <a href="PayWithCrypto.php?id=<?php echo base64_encode($invo_id); ?>&renew=<?php echo $renew; ?>"
                         class="btn btn-info btn-bold px-4  mt-3 mt-lg-0">Pay With Crypto</a>
                     &nbsp;&nbsp;
-                    <a href="PayNow.php?id=<?php echo base64_encode($invo_id); ?>"
+                    <a href="PayNow.php?id=<?php echo base64_encode($invo_id);?>&renew=<?php echo $renew; ?>"
                         class="btn btn-info btn-bold px-4  mt-3 mt-lg-0">Pay Now</a>
                     &nbsp;&nbsp;
                     <?php
@@ -229,7 +234,7 @@
                         <button class="btn btn-info btn-bold px-4 float-right mt-3 mt-lg-0" id="lowbalance"
                             onclick="lowbalance()">Pay With Wallet</button>&nbsp;&nbsp;
                     <?php } else { ?>
-                        <a href="walletpayNow.php?id=<?php echo base64_encode($invo_id); ?>"
+                        <a href="walletpayNow.php?id=<?php echo base64_encode($invo_id);?>&renew=<?php echo $renew; ?>"
                             class="btn btn-info btn-bold px-4 float-right mt-3 mt-lg-0">Pay With Wallet</a>&nbsp;&nbsp;
                     <?php } ?>
                 </div>

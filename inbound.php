@@ -8,24 +8,19 @@
                 <div class="col-md-12">
                     <div class="overview-wrap">
                         <h2 class="title-1"> Inbound Information <span style="margin-left:50px;"></span></h2>
-
                         <?php if ($_SESSION['userroleforpage'] == 1) { ?>
-                            <div class="table-data__tool-right">
-                                <a href="inboundadd.php">
-                                    <button class="au-btn au-btn-icon au-btn--blue">
-                                        <i class="fa fa-plus-circle"></i>Add Destination</button></a>
-                                <!--
-                            <a href="inboundgroup.php">
-                            <button class="au-btn au-btn-icon au-btn--blue" style="margin-left: 20px;">
-                            <i class="fa fa-eye"></i>Inbound Groups</button></a>
-                            <a href="#">
-                            <button class="au-btn au-btn-icon au-btn--blue">
-                            <i class="fa fa-plus-circle"></i>ADD IVR</button></a>
-                            <a href="#">
-                            <button class="au-btn au-btn-icon au-btn--blue">
-                            <i class="fa fa-plus-circle"></i>SHOW IVR</button></a>-->
-                            </div>
-                        <?php } ?>
+    <div class="table-data__tool-right" style="display: flex; gap: 10px;">
+        <button class="au-btn au-btn-icon au-btn--green" type="submit" id="export" name="export" value="submit">
+            <i class="fa fa-download"></i>Download CSV
+        </button>
+        <a href="inboundadd.php">
+            <button class="au-btn au-btn-icon au-btn--blue">
+                <i class="fa fa-plus-circle"></i>Add Destination
+            </button>
+        </a>
+    </div>
+<?php } ?>
+
                         <?php if ($_SESSION['userroleforpage'] == 2) { ?>
                             <div class="table-data__tool-right">
                                 <a href="did_search_purchase.php">
@@ -44,7 +39,7 @@
             }
             ?>
             <script>
-                setTimeout(function() {
+                setTimeout(function () {
                     var element = document.getElementById('message');
                     element.parentNode.removeChild(element);
                 }, 2000);
@@ -64,7 +59,7 @@
                                         <th>User</th>
                                     <?php } ?>
                                     <?php if ($_SESSION['userroleforpage'] != 1) { ?>
-                                    <th>Email</th>
+                                        <th>Email</th>
                                     <?php } ?>
                                     <th>Company</th>
                                     <?php if ($_SESSION['userroleforpage'] == 1) { ?>
@@ -93,17 +88,17 @@
                                 'columns': [
                                     { data: 'did' },
                                     <?php if ($_SESSION['userroleforpage'] == 1) { ?>
-                        { data: 'userType' },
+                            { data: 'userType' },
                                     <?php } ?>
                                     <?php if ($_SESSION['userroleforpage'] == 1) { ?>
-                                    { data: 'username' },
+                                        { data: 'username' },
                                     <?php } ?> 
                                     <?php if ($_SESSION['userroleforpage'] != 1) { ?>
-                    { data: 'email' },
-                    <?php } ?>
+                        { data: 'email' },
+                                    <?php } ?>
                                     { data: 'clientName' },
                                     <?php if ($_SESSION['userroleforpage'] == 1) { ?>
-                        { data: 'carieer' },
+                            { data: 'carieer' },
                                     <?php } ?>
                     { data: 'didtype' },
                                     { data: 'call_destination' },
@@ -133,5 +128,21 @@
         }
         return false;
     }
+</script>
+<script>
+	$(document).ready(function () {
+		$('#export').click(function (event) {
+			event.preventDefault();
+			$.ajax({
+				url: 'did_csv.php',
+				success: function (response) {
+					var downloadLink = document.createElement('a');
+					downloadLink.href = 'did_csv.php';
+					downloadLink.download = 'did_csv.csv';
+					downloadLink.click();
+				}
+			});
+		});
+	});
 </script>
 <?php require_once('footer.php'); ?>

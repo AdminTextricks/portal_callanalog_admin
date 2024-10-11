@@ -1,5 +1,32 @@
 <?php
+$page = $_SERVER['REQUEST_URI'];
+$page = strtok($page, '?');
+$pageName = explode('/', $page);
+$filename = end($pageName);
+$title = ucfirst(rtrim($filename, ".php"));
 
+$customTitles = [
+    'barge.php' => 'Live Calls',
+    'recharge_history.php' => 'Recharge History',
+    'sipregistration_list.php' => 'Registered Extensions',
+    'inboundRports.php' => 'Inbound Reports',
+    'outboundRports.php'=> 'Outbound Reports',
+    'transactionRports.php'=> 'Transaction Reports',
+    'extedit.php'=>'Extension Edit',
+    'user_add_admin.php'=>'Add User',
+    'creditsadd.php'=>'Add Balance',
+    'inbound.php'=>'DID/TFN',
+    'inboundedit.php'=>'DID/TFN Edit',
+    'didadd.php'=>   'Add DID/TFN',
+    'did_deleted.php'=> 'Deleted DID/TFN',
+    'users.php'=>'All Users',
+    'blacklist.php'=>'Block Numbers',
+    'blacklistedit.php'=>'Edit Block Number',
+    'upload_documents_list.php'=>'Documents',
+    'timegroupadd.php'=>' Add Time Condition',
+    'timegroup.php'=>'Time Condition'
+];
+$title = isset($customTitles[$filename]) ? $customTitles[$filename] : $title;
 //Set the session timeout for 2 seconds
 // $timeout = 60 * 20; 
 $timeout = 2 * 60 * 60;
@@ -8,7 +35,7 @@ ini_set("session.gc_maxlifetime", $timeout);
 //Set the cookie lifetime of the session
 ini_set("session.cookie_lifetime", $timeout);
 //Start a new session
-session_start();
+// session_start();
 //Set the default session name
 $s_name = session_name();
 // echo $s_name;exit;
@@ -128,8 +155,8 @@ if (empty($useriid2) && empty($up_status_doc2)) {
 	<meta name="author" content="Hau Nguyen">
 	<meta name="keywords" content="au theme template">
 
-	<title>Call Analog</title>
-
+	
+	<title><?php echo isset($title) ? $title : "Dashboard"; ?></title>
 	<link href="resources/css/font-face.css" rel="stylesheet" media="all">
 	<!-- <link href="assets/css/popcss.css" rel="stylesheet" media="all">  -->
 
@@ -752,16 +779,20 @@ if (empty($useriid2) && empty($up_status_doc2)) {
 							</li>
 
 							<li class="dropdown">
-								<a data-toggle="collapse" href="#dropdown-lvlulm2" class="collapsed" aria-expanded="false">
+								<a data-toggle="collapse" href="#dropdown-lvlulm23" class="collapsed" aria-expanded="false">
 									<i class="fa fa-user"></i><span class="menu-title">DID</span>
 									<span class="caret"></span> </a>
-								<div id="dropdown-lvlulm2" class="panel-collapse collapse" aria-expanded="false"
+								<div id="dropdown-lvlulm23" class="panel-collapse collapse" aria-expanded="false"
 									style="height: 0px;">
 									<ul class="nav flex-column sub-menu" style="list-style-type:disc;">
+										<li class="nav-item"><a class="nav-link" href="didadd.php"> <i
+													class="fa fa-circle  font-10"></i>Add DID</a></li>
+										<li class="nav-item"><a class="nav-link" href="importdid.php"> <i
+													class="fa fa-circle  font-10"></i>Import DID</a></li>
 										<li class="nav-item"><a class="nav-link" href="did.php"> <i
-													class="fa fa-circle  font-10"></i> Add DID</a></li>
-										<li class="nav-item"><a class="nav-link" href="did_purchase_history.php"> <i
-													class="fa fa-circle  font-10"></i> DID Purchase History</a></li>
+													class="fa fa-circle  font-10"></i>DID List</a></li>
+										<li class="nav-item"><a class="nav-link" href="did_deleted.php"> <i
+													class="fa fa-circle  font-10"></i> Deleted DID</a></li>
 									</ul>
 								</div>
 							</li>
@@ -1342,11 +1373,11 @@ if (empty($useriid2) && empty($up_status_doc2)) {
 									<ul class="nav flex-column sub-menu" style="list-style-type:disc;">
 										<li class="nav-item"><a class="nav-link" href="didadd.php"> <i
 													class="fa fa-circle  font-10"></i>Add DID</a></li>
-													<li class="nav-item"><a class="nav-link" href="importdid.php"> <i
+										<li class="nav-item"><a class="nav-link" href="importdid.php"> <i
 													class="fa fa-circle  font-10"></i>Import DID</a></li>
 										<li class="nav-item"><a class="nav-link" href="did.php"> <i
 													class="fa fa-circle  font-10"></i>DID List</a></li>
-													<li class="nav-item"><a class="nav-link" href="did_deleted.php"> <i
+										<li class="nav-item"><a class="nav-link" href="did_deleted.php"> <i
 													class="fa fa-circle  font-10"></i> Deleted DID</a></li>
 										<!-- <li class="nav-item"><a class="nav-link" href="did_history.php"> <i
 													class="fa fa-circle  font-10"></i> DID History</a></li> -->

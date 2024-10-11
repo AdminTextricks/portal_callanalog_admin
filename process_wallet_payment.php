@@ -6,23 +6,23 @@ include_once 'functions.php';
 
 
 
-$amount_cents           = $_POST['stripeAmount'];
-$currency               = $_POST['stripeCurrency'];
-$invoice_id             = $_POST['invoice_id'];
-$gatway_invoice_id      = $_POST['gatway_invoice_id'];
-$user_id                = $_POST['user_id'];
-$item_name              = $_POST['item_name'];
-$item_type              = $_POST['item_type'];
-$payment_type           = $_POST['payment_type'];
-$payment_status         = "Unpaid";
-$item_number            = 'UID-' . $user_id . '/ Amount-' . $amount_cents;
-$btn_type               = $_POST['crypto'];
-$email                  = $_SESSION['login_user'];
+$amount_cents = $_POST['stripeAmount'];
+$currency = $_POST['stripeCurrency'];
+$invoice_id = $_POST['invoice_id'];
+$gatway_invoice_id = $_POST['gatway_invoice_id'];
+$user_id = $_POST['user_id'];
+$item_name = $_POST['item_name'];
+$item_type = $_POST['item_type'];
+$payment_type = $_POST['payment_type'];
+$payment_status = "Unpaid";
+$item_number = 'UID-' . $user_id . '/ Amount-' . $amount_cents;
+$btn_type = $_POST['crypto'];
+$email = $_SESSION['login_user'];
 
 
 // echo"<pre>";print_r($btn_type );die;
-if ($btn_type == 'Pay with BTC') {
-    $pay_currency = 'BTC';
+if ($btn_type == 'Pay with USDTTRC-20') {
+    $pay_currency = 'usdttrc20';
     $apiKey = 'BE5A9TP-666MRMH-NKSJZH0-E8XTN4B';
 } elseif ($btn_type == 'Pay with USD') {
     $pay_currency = 'USD';
@@ -34,9 +34,8 @@ if ($btn_type == 'Pay with BTC') {
 
 $invoice_sql = "INSERT INTO `invoices`(`user_id`, `invoice_id`, `item_type`,`invoice_currency`, `invoice_amount`, `payment_status`) VALUES('" . $user_id . "','" . $gatway_invoice_id . "','" . $item_type . "','" . $currency . "','" . $amount_cents . "','" . $payment_status . "')";
 
-// echo $invoice_sql; exit;
 $inv_res = mysqli_query($connection, $invoice_sql) or die("query failed : invoice_sql");
-$insert_invoice_item = "INSERT INTO `invoices_items`(`invoice_id`, `item_type`, `item_number`, `price`) VALUES ('" . $invoice_id  . "','" . $item_type . "','" . $item_number . "','" . $amount_cents . "')";
+$insert_invoice_item = "INSERT INTO `invoices_items`(`invoice_id`, `item_type`, `item_number`, `price`) VALUES ('" . $invoice_id . "','" . $item_type . "','" . $item_number . "','" . $amount_cents . "')";
 $query_res_invo = mysqli_query($connection, $insert_invoice_item);
 
 
@@ -46,7 +45,7 @@ $user_details = mysqli_query($connection, $user_select);
 if (mysqli_num_rows($user_details) > 0) {
     $card_row = mysqli_fetch_assoc($user_details);
     $accountcode = $card_row['username'];
-    $user_name   = $card_row['firstname'];
+    $user_name = $card_row['firstname'];
 
     $query_inv = "select * from invoices where id='" . $invoice_id . "' and payment_status='Unpaid'";
     $result_inv = mysqli_query($connection, $query_inv);
@@ -136,6 +135,9 @@ if ($amount_cents > 0 && $invoice_details['invoice_amount'] == $amount_cents) {
 
                 // Check if payment_id is present in the response
                 if (isset($responseData['payment_id'])) {
+
+                    $insert_btc = "INSERT INTO `btc_gateways`(`pay_address`,`pay_amount`,`pay_currency`,`order_id`,`invoice_id`,`gateway_invo_id`,`user_id`,`clientId`,`email`,`username`,`item_type`,`item_number`,`accountcode`,`payment_status`,`payment_id`,`created_at`) VALUES ('" . $responseData['pay_address'] . "','" . $responseData['pay_amount'] . "','" . $responseData['pay_currency'] . "','" . $responseData['order_id'] . "','" . $invoice_id . "','" . $gateway_invo_id . "','" . $user_id . "','" . $_SESSION['userroleforclientid'] . "','" . $email . "','" . $user_name . "','" . $item_type . "','" . $item_number . "','" . $accountcode . "','waiting','" . $responseData['payment_id'] . "','" . date('Y-m-d H:i:s') . "')";
+                    $result_btc = mysqli_query($connection, $insert_btc) or die("query failed : insert_btc");
                     // Generate payment link
                     $paymentLink = 'payment_wallet_confirmation.php?pay_address=' . $responseData['pay_address'] . '&payment_id=' . $responseData['payment_id'] . '&price_amount=' . $responseData['price_amount'] . '&pay_currency=' . $responseData['pay_currency'] . '&order_id=' . $responseData['order_id'] . '&pay_amount=' . $responseData['pay_amount'] . '&amount_received=' . $responseData['amount_received'] . '&invoice_id=' . $invoice_id . '&gateway_invo_id=' . $gateway_invo_id . '&paid_amount=' . $paid_amount;
 
