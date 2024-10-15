@@ -1,11 +1,16 @@
 <?php
 include 'connection.php';
 include 'functions.php';
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
 $fromDate = $_GET['fromDate'];
 $fromTime = $_GET['fromTime'];
+
+$table_name = $_GET['month'];
+/* if ($Selectedmonth == 'cc_cdr') {
+    $table_name = 'cc_cdr';
+} else {
+    $table_name = 'cc_cdr_22072024';
+} */
+
 $fromdates = $fromDate . ' ' . $fromTime;
 $toDate = $_GET['toDate'];
 $toTime = $_GET['toTime'];
@@ -27,11 +32,10 @@ function seconds2human($ss)
 }
 
 if (isset($_GET['disposition']) && strlen($_GET['disposition']) > 0) {
-    //$disposition = 'and cc_cdr.disposition = "'.$_GET['disposition'].'"';
     if ($_GET['disposition'] == 'ANSWER') {
-        $disposition = 'and cc_cdr.answertime != ""';
+        $disposition = 'AND ' . $table_name . '.answertime != ""';
     } elseif ($_GET['disposition'] == 'MISSED CALL') {
-        $disposition = 'and cc_cdr.answertime = ""';
+        $disposition = 'AND ' . $table_name . '.answertime = ""';
     } else {
         $disposition = '';
     }
@@ -41,47 +45,46 @@ if (isset($_GET['disposition']) && strlen($_GET['disposition']) > 0) {
 
 $queueNames = isset($_GET['queueName']) ? $_GET['queueName'] : '';
 if (strlen($queueNames) > 0) {
-    $queueNames = "and cc_cdr.destination='" . $queueNames . "'";
+    $queueNames = "AND " . $table_name . ".destination='" . $queueNames . "'";
 } else {
     $queueNames = '';
 }
 
 $extensions = isset($_GET['extension']) ? $_GET['extension'] : '';
 if (strlen($extensions) > 0) {
-    $extensions = "and cc_cdr.channel='" . $extensions . "'";
+    $extensions = "AND " . $table_name . ".agent='" . $extensions . "'";
 } else {
     $extensions = '';
 }
 
 $DIDSS = isset($_GET['DID']) ? $_GET['DID'] : '';
 if (strlen($DIDSS) > 0) {
-    $DIDSS = "and cc_cdr.DID='" . $DIDSS . "'";
+    $DIDSS = "AND " . $table_name . ".DID='" . $DIDSS . "'";
 } else {
     $DIDSS = '';
 }
 
-$CLID = isset($_GET['CLID']) ? $_GET['CLID'] : '';
 
+$CLID = isset($_GET['CLID']) ? $_GET['CLID'] : '';
 if (strlen($CLID) > 0) {
-    $CLID = "and cc_cdr.caller_num='" . $CLID . "'";
+    // Use LIKE operator for partial matching
+    $CLID = "AND " . $table_name . ".caller_num LIKE '%" . $CLID . "%'";
 } else {
     $CLID = '';
 }
 
 
 if ($_SESSION['userroleforpage'] == 1) {
-    $query_cdr = "SELECT cc_cdr.*  FROM `cc_cdr` where cc_cdr.calldate between '" . $fromdates . "' and '" . $todates . "' " . $disposition . " " . $queueNames . " " . $extensions . " " . $DIDSS . " " . $CLID . " order by cc_cdr.id DESC";
+    $query_cdr = "SELECT * FROM `" . $table_name . "` WHERE " . $table_name . ".calldate BETWEEN '" . $fromdates . "' AND '" . $todates . "' " . $disposition . " " . $queueNames . " " . $extensions . " " . $DIDSS . " " . $CLID . " ORDER BY " . $table_name . ".id DESC";
 } else {
-    $query_cdr = "SELECT cc_cdr.* FROM `cc_cdr` where cc_cdr.calldate between '" . $fromdates . "' and '" . $todates . "' " . $disposition . " " . $queueNames . " " . $extensions . " " . $DIDSS . " " . $CLID . " and cc_cdr.account_code='" . $_SESSION['login_usernames'] . "' order by cc_cdr.id DESC";
+    $query_cdr = "SELECT * FROM `" . $table_name . "` WHERE " . $table_name . ".calldate BETWEEN '" . $fromdates . "' AND '" . $todates . "' " . $disposition . " " . $queueNames . " " . $extensions . " " . $DIDSS . " " . $CLID . " AND " . $table_name . ".account_code='" . $_SESSION['login_usernames'] . "' ORDER BY " . $table_name . ".id DESC";
 }
-
-// echo $query_cdr;exit;
 
 $result_export = mysqli_query($connection, $query_cdr);
 
 if (mysqli_num_rows($result_export) > 0) {
     $delimiting = ",";
-    $filename = 'inbound_report' . '_' . date('Y-m-d') . '.csv';
+    $filename = 'inbound_report_' . date('Y-m-d') . '.csv';
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="' . $filename . '";');
     $output = fopen('php://output', 'w');
@@ -90,12 +93,11 @@ if (mysqli_num_rows($result_export) > 0) {
     } else {
         $orgination_IP = '';
     }
-    $fields = array('Serial No', 'Date', 'Status', 'CID', 'DID/TFN','Destination Type', 'Destination', 'Extension', 'Agent', 'Duration', 'Cost', 'Recordings', $orgination_IP);
+    $fields = array('Serial No', 'Date', 'Status', 'CID', 'DID/TFN', 'Destination Type', 'Destination', 'Extension', 'Agent', 'Duration', 'Cost', 'Recordings', $orgination_IP);
     fputcsv($output, $fields, $delimiting);
     $i = 1;
     while ($row_cdr = mysqli_fetch_assoc($result_export)) {
         $rec_path = $row_cdr['Recording'];
-        // $rec_path = preg_replace('".wav"', '.mp3', $row_cdr['Recording']);
         if ($row_cdr['disposition'] == "ANSWER") {
             $disposition = 'ANSWER';
             $rec_download = "https://portal-myphonesystems-recordings.s3.ap-south-1.amazonaws.com/" . date('Y-m-d', strtotime($row_cdr['calldate'])) . "/" . $rec_path;
@@ -106,6 +108,7 @@ if (mysqli_num_rows($result_export) > 0) {
             $disposition = $row_cdr['disposition'];
             $rec_download = "No Record";
         }
+
         if ($_SESSION['userroleforpage'] !== '1') {
             $newDate = timezone($row_cdr['calldate']);
         } else {
@@ -118,11 +121,10 @@ if (mysqli_num_rows($result_export) > 0) {
             $orgination_IP = '';
         }
 
-        // Hyperlink for recordings
         $recordings_hyperlink = '';
         if ($rec_download !== "No Record") {
             $recordings_hyperlink = '=HYPERLINK("' . $rec_download . '", "Recording Download")';
-        }else{
+        } else {
             $recordings_hyperlink = "No Record";
         }
 
@@ -140,7 +142,6 @@ if (mysqli_num_rows($result_export) > 0) {
             $row_cdr['cost'],
             $recordings_hyperlink,
             $orgination_IP
-            // $rec_download
         );
         fputcsv($output, $lineData, $delimiting);
         $i++;
@@ -152,3 +153,4 @@ if (mysqli_num_rows($result_export) > 0) {
     echo "No data found for export";
     exit;
 }
+?>
